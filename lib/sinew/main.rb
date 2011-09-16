@@ -154,7 +154,6 @@ module Sinew
       else
         s = s.to_s
       end
-
       s = s.untag.convert_accented_entities.unent.to_ascii.squish
       s
     end

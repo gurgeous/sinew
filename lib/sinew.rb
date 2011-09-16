@@ -1,4 +1,6 @@
 require "sinew/version"
 require "sinew/util"
 require "sinew/curler"
+require "sinew/text_util"
+require "sinew/awesome_print"
 require "sinew/main"

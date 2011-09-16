@@ -19,6 +19,30 @@ module Sinew
       "--force-output" => "yes",    
       "-f" => "/dev/null",
     }
+
+    XML_ENTITIES = { "&"=>"&amp;", "<"=>"&lt;", ">"=>"&gt;", "'"=>"&apos;", '"'=>"&quot;" }
+    XML_ENTITIES_INV = XML_ENTITIES.invert
+    COMMON_ENTITIES_INV = XML_ENTITIES_INV.merge(
+                                                 "&frac12;" => "1/2",
+                                                 "&frac14;" => "1/4",
+                                                 "&frac34;" => "3/4",
+                                                 "&ldquo;" => '"',
+                                                 "&lsquo;" => "'",
+                                                 "&mdash;" => "-",
+                                                 "&nbsp;" => " ",
+                                                 "&ndash;" => "-",
+                                                 "&rdquo;" => '"',
+                                                 "&rsquo;" => "'",
+                                                 "&tilde;" => "~",
+                                                 "&#34;" => '"',
+                                                 "&#39;" => "'",
+                                                 "&#160;" => " ",
+                                                 "&#8232;" => "\n"
+                                                 )
+    
+    #
+    # tidy/clean
+    #
     
     def html_tidy(s)
       # run tidy
@@ -55,5 +79,35 @@ module Sinew
       end
       s
     end
+
+    #
+    # untag/unent
+    #
+
+    def xml_escape(s)
+      s.gsub(/[&<>'"]/) { |i| XML_ENTITIES[i] }
+    end
+
+    def xml_unescape(s)
+      s.gsub(/&(amp|lt|gt|apos|quot);/) { |i| XML_ENTITIES_INV[i] }
+    end
+
+    def untag(s)
+      s.gsub(/<[^>]+>/, " ")    
+    end
+
+    def unent(s)
+      s.gsub(/&#?[a-z0-9]{2,};/) { |i| COMMON_ENTITIES_INV[i] }
+    end
+  end
+end
+
+# add a few helpers to String
+class String
+  def unent
+    Sinew::TextUtil.unent(self)
+  end
+  def untag
+    Sinew::TextUtil.untag(self)
   end
 end
