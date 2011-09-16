@@ -1,0 +1,26 @@
+#!/usr/bin/env ruby
+
+# gems
+require "rubygems"
+require "bundler"
+Dir.chdir(File.dirname(__FILE__)) { Bundler.setup }
+
+$LOAD_PATH << File.expand_path("../../lib", __FILE__)
+require "sinew"
+require "trollop"
+
+# in lieu of -w, since we're using env to startup
+$VERBOSE = true
+
+options = Trollop.options do
+  banner "Usage: sinew [options] <gub.sinew>"
+  opt :verbose, "Dump every row"
+end
+Trollop.die "need a .sinew file to run against" if ARGV.empty?
+
+ARGV.each do |i|
+  options[:file] = i
+  Sinew::Main.new(options)
+end
+
+
