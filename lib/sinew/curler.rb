@@ -82,6 +82,7 @@ module Sinew
             nretries = @options[:retry]
             begin
               @curl.perform
+              raise "too small" if @curl.body_str.length < 5
             rescue Exception => e
               retry if (nretries -= 1) > 0
               raise e
