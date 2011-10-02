@@ -360,6 +360,11 @@ module Sinew
       s
     end
 
+    # checksum some text
+    def md5(s)
+      Digest::MD5.hexdigest(s.to_s)
+    end
+
     private
 
     # Returns true if verbosity is turned on.

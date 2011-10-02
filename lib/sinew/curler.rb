@@ -58,6 +58,8 @@ module Sinew
       # shorten long paths
       if path.length > 250
         dir, base = File.dirname(path), File.basename(path)
+        # remove tm/sig for Amazon EC2 api requests
+        base = base.gsub(/(timestamp|signature)=[^,]+/, "")
         path = "#{dir}/#{Util.md5(base)}"
       end
       
