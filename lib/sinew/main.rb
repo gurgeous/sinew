@@ -1,15 +1,31 @@
+require "nokogiri" # must be loaded before awesome_print
 require "awesome_print"
 require "htmlentities"
-require "nokogiri"
 require "stringex"
-require "trollop"
 
-# modify NodeSet.inner_html to join with SPACE instead of empty string
+# modify NodeSet to join with SPACE instead of empty string
 class Nokogiri::XML::NodeSet
   alias :old_inner_html :inner_html
+  alias :old_inner_text :inner_text  
   
+  def inner_text
+    collect { |i| i.inner_text }.join(" ")
+  end
   def inner_html *args
-    collect{|j| j.inner_html(*args) }.join(" ")
+    collect { |i| i.inner_html(*args) }.join(" ")
+  end
+end
+
+# text_just_me
+class Nokogiri::XML::Node
+  def text_just_me
+    t = children.find { |i| i.node_type == Nokogiri::XML::Node::TEXT_NODE }
+    t && t.text
+  end
+end
+class Nokogiri::XML::NodeSet
+  def text_just_me
+    map { |i| i.text_just_me }.join(" ")
   end
 end
 

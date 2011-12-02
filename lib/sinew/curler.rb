@@ -1,7 +1,4 @@
-require "curb"
 require "uri"
-
-# sudo apt-get install libcurl4-openssl-dev
 
 module Sinew
   class Curler
@@ -19,6 +16,7 @@ module Sinew
 
     def initialize(options = {})
       @options = DEFAULT_OPTIONS.merge(options)
+      @curl_args = ["--silent", "--fail", "--user-agent", @options[:user_agent], "--max-time", @options[:max_time], "--retry", @options[:retry], "--location", "--max-redirs", "3"]      
       @last_request = Time.at(0)
 
       @options[:verbose] = 1 if @options[:verbose] == true
@@ -32,8 +30,6 @@ module Sinew
           @root = "/tmp/sinew"
         end
       end
-
-      @curl = Curl::Easy.new
     end
 
     def get(url)
@@ -71,71 +67,65 @@ module Sinew
         tmph = "#{tmp}.head"
         begin
           rate_limit
+          Util.mkdir_if_necessary(File.dirname(path))
+          Util.mkdir_if_necessary(File.dirname(head))        
           begin
-            @curl.reset
-            @curl.headers["User-Agent"] = @options[:user_agent]
-            @curl.timeout = @options[:max_time]
-            @curl.follow_location = true
-            @curl.max_redirects = 3
-            @curl.url = @url
-            @curl.post_body = body if body
-
-            # make the request
-            nretries = @options[:retry]
-            begin
-              @curl.perform
-              raise "too small" if @curl.body_str.length < 5
-            rescue Exception => e
-              retry if (nretries -= 1) > 0
-              raise e
+            command = []
+            command += @curl_args
+            if body
+              command += ["--data-binary", body]
+              command += ["--header", "Content-Type: application/x-www-form-urlencoded"]
             end
-
-            # redirects
-            if @curl.url != @curl.last_effective_url
-              File.open(tmph, "w") { |f| f.puts "Location: #{@curl.last_effective_url}" }
+            command += ["--output", tmp]
+            command += ["--dump-header", tmph]
+            command << @url
+            
+            Util.run("curl", command)
+          rescue Util::RunError => e
+            message = "curl error"
+            if e.message =~ /(\d+)$/
+              message = "#{message} (#{$1})"
             end
-
-            # save response
-            if @options[:compress]
-              Zlib::GzipWriter.open(tmp) { |f| f.write(@curl.body_str) }
-            else
-              File.open(tmp, "w") { |f| f.write(@curl.body_str) }
-            end
-          rescue Curl::Err::CurlError => e
-            message = "#{e.class} #{e.message}"
+            
             # cache the error?
             if @options[:cache_errors]
               File.open(path, "w") { |f| f.puts "" }
               File.open(head, "w") { |f| f.puts "CURLER_ERROR\t#{message}" }
             end
+            
             raise Error, message
           end
-          Util.mkdir_if_necessary(File.dirname(path))
           Util.mv(tmp, path)
-          if File.exists?(tmph)
-            Util.mkdir_if_necessary(File.dirname(head))        
-            Util.mv(tmph, head)
-          end
+          Util.mv(tmph, head)
         ensure
           Util.rm_if_necessary(tmp)
           Util.rm_if_necessary(tmph)
         end
-      else
-        verbose("read #{@url}", 2)
       end
-
+      
       #
       # handle redirects (recalculate @uri/@url)
       #
 
       if File.exists?(head)
-        case File.read(head)
-        when /^CURLER_ERROR\t(.*)/
+        head_contents = File.read(head)
+        # handle cached errors
+        if head_contents =~ /^CURLER_ERROR\t(.*)/
           raise Error, $1
-        when /^Location: (.*)/
-          @uri = URI.parse($1)
-          @url = @uri.to_s
-          verbose(" => #{@url}", 2)
+        end
+        original = @uri
+        head_contents.scan(/\A(HTTP\/\d\.\d (\d+).*?\r\n\r\n)/m) do |i|
+          headers, code = $1, $2
+          if code =~ /^3/
+            if redir = headers[/^Location: ([^\r\n]+)/, 1]
+              @uri += redir
+              @url = @uri.to_s
+            end
+          end
+        end
+        # kill unnecessary head files
+        if original == @uri
+          Util.rm(head)
         end
       end
       
@@ -171,7 +161,7 @@ module Sinew
     def self.uri_to_path(uri)
       s = uri.path
       s = "#{s}?#{uri.query}" if uri.query
-      "#{Util.pathify(uri.host || "local")}/#{Util.pathify(s)}"
+      "#{Util.pathify(uri.host)}/#{Util.pathify(s)}"
     end
     
     def rate_limit

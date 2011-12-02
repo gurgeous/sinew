@@ -2,7 +2,6 @@ source "http://rubygems.org"
 
 gem "activesupport"
 gem "awesome_print"
-gem "curb"
 gem "fastercsv"
 gem "htmlentities"
 gem "i18n"
