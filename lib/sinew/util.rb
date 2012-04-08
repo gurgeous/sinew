@@ -1,7 +1,7 @@
 require "cgi"
+require "csv"
 require "digest/md5"
 require "etc"
-require "fastercsv"
 require "fileutils"
 require "open3"
 require "uri"
@@ -325,9 +325,9 @@ module Sinew
     # Read a CSV file
     def csv(path)
       if path =~ /\.gz$/
-        lines = Zlib::GzipReader.open(path) { |f| FasterCSV.parse(f) }
+        lines = Zlib::GzipReader.open(path) { |f| CSV.parse(f) }
       else
-        lines = FasterCSV.read(path)
+        lines = CSV.read(path)
       end
       keys = lines.shift.map(&:to_sym)
       clazz = Struct.new(*keys)

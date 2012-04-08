@@ -88,7 +88,7 @@ module Sinew
         else
           path = CURLER.post(url, body)
         end
-        @raw = File.read(path)
+        @raw = File.open(path, "rb") { |f| f.read }
       rescue Curler::Error => e
         $stderr.puts "xxx #{e.message}"
         @raw = ""
@@ -155,7 +155,7 @@ module Sinew
       file = ext.empty? ? "#{file}.csv" : file.gsub(ext, ".csv")
 
       @path = file
-      @csv = FasterCSV.open(file, "w")
+      @csv = CSV.open(file, "w")
       @csv_keys = args
       @csv << @csv_keys
       Util.banner("Writing to #{@path}...")
