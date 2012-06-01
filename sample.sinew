@@ -6,5 +6,3 @@ noko.css(".zg_itemRow").each do |item|
   row[:img] = item.css(".zg_itemImage_normal img").first[:src]
   csv_emit(row)
 end
-
-  
