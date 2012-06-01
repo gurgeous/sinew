@@ -8,13 +8,14 @@ require "stringex"
 module Sinew
   class Main
     CODER = HTMLEntities.new
-    CURLER = Curler.new
 
     attr_accessor :url, :uri, :raw
 
     def initialize(options)
       @options = options.dup
       @csv = @path = nil
+
+      @curler = Curler.new(user_agent: "sinew/#{VERSION}")
 
       file = @options[:file]
       if !File.exists?(file)
@@ -60,9 +61,9 @@ module Sinew
 
       begin
         if method == :get
-          path = CURLER.get(url)
+          path = @curler.get(url)
         else
-          path = CURLER.post(url, body)
+          path = @curler.post(url, body)
         end
         @raw = File.read(path, mode: "rb")
       rescue Curler::Error => e
@@ -71,7 +72,7 @@ module Sinew
       end
 
       # setup local variables
-      @url, @uri = CURLER.url, CURLER.uri
+      @url, @uri = @curler.url, @curler.uri
       @html = nil
       @clean = nil
       @noko = nil

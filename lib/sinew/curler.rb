@@ -6,8 +6,6 @@ module Sinew
     
     DEFAULT_OPTIONS = {
       :cache_errors => true,
-      :cookies => false,
-      :user_agent => "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.0; Trident/4.0)",
       :max_time => 30,
       :retry => 3,
       :verbose => true,
