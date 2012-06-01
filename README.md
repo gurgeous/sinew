@@ -1,6 +1,8 @@
 ## Welcome to Sinew
 
-Sinew collects structured data from web sites (screen scraping). It comes with a robust caching system, integration with nokogiri, and a DSL that makes crawling easy.
+Sinew collects structured data from web sites (screen scraping). It comes with a DSL that makes crawling easy, a robust caching system, and integration with nokogiri.
+
+Though small, this project is the culmination of years of effort based on indexing systems built at several different companies.
 
 ## Example
 
@@ -18,12 +20,12 @@ noko.css(".zg_itemRow").each do |item|
   row[:title] = item.css(".zg_title")
   row[:img] = item.css(".zg_itemImage_normal img").first[:src]
   
-  # emit a row to the csv
+  # append a row to the csv
   csv_emit(row)
 end
 ```
 
-If you paste this into a file called `bestsellers.sinew` and run `sinew bestsellers.sinew`, it will create a `bestsellers.csv` file containing the url, title and img for each book.
+If you paste this into a file called `bestsellers.sinew` and run `sinew bestsellers.sinew`, it will create a `bestsellers.csv` file containing the url, title and img for each bestseller.
 
 ## Full Documentation
 
