@@ -101,13 +101,3 @@ module Sinew
     end
   end
 end
-
-# add a few helpers to String
-class String
-  def unent
-    Sinew::TextUtil.unent(self)
-  end
-  def untag
-    Sinew::TextUtil.untag(self)
-  end
-end

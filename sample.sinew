@@ -1,5 +1,3 @@
-csv_header %w(url title img).map(&:to_sym)
-
 get "http://www.amazon.com/gp/bestsellers/books/ref=sv_b_3"
 noko.css(".zg_itemRow").each do |item|
   row = { }

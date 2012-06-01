@@ -6,25 +6,23 @@ module Sinew
     
     DEFAULT_OPTIONS = {
       :cache_errors => true,
+      :cookies => false,
       :user_agent => "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.0; Trident/4.0)",
       :max_time => 30,
       :retry => 3,
-      :verbose => 2,
+      :verbose => true,
     }
     
     attr_reader :url, :uri, :root
 
     def initialize(options = {})
       @options = DEFAULT_OPTIONS.merge(options)
-      @curl_args = ["--silent", "--fail", "--user-agent", @options[:user_agent], "--max-time", @options[:max_time], "--retry", @options[:retry], "--location", "--max-redirs", "3"]      
-      @last_request = Time.at(0)
-
-      @options[:verbose] = 1 if @options[:verbose] == true
-      @options[:verbose] = @options[:verbose].to_i
+      @curl_args = ["--silent", "--fail", "--user-agent", @options[:user_agent], "--max-time", @options[:max_time], "--retry", @options[:retry], "--location", "--max-redirs", "3"]
+      @last_request = Time.at(0)      
 
       @root = @options[:dir]
       if !@root
-        if File.stat(ENV["HOME"]).writable?
+        if File.exists?(ENV["HOME"]) && File.stat(ENV["HOME"]).writable?
           @root = "#{ENV["HOME"]}/.sinew"
         else
           @root = "/tmp/sinew"
@@ -54,8 +52,6 @@ module Sinew
       # shorten long paths
       if path.length > 250
         dir, base = File.dirname(path), File.basename(path)
-        # remove tm/sig for Amazon EC2 api requests
-        base = base.gsub(/(timestamp|signature)=[^,]+/, "")
         path = "#{dir}/#{Util.md5(base)}"
       end
       
@@ -81,6 +77,12 @@ module Sinew
             command << @url
             
             Util.run("curl", command)
+
+            # empty response?
+            if !File.exists?(tmp)
+              Util.touch(tmp)
+              Util.touch(tmph)            
+            end
           rescue Util::RunError => e
             message = "curl error"
             if e.message =~ /(\d+)$/
@@ -132,8 +134,8 @@ module Sinew
       path
     end
     
-    def verbose(s, level = 1)
-      $stderr.puts s if @options[:verbose] >= level
+    def verbose(s)
+      $stderr.puts s if @options[:verbose]
     end
 
     #
@@ -165,10 +167,9 @@ module Sinew
     end
     
     def rate_limit
-      now = Time.now
-      sleep = (@last_request + 1) - now
+      sleep = (@last_request + 1) - Time.now
       sleep(sleep) if sleep > 0
-      @last_request = now
+      @last_request = Time.now
     end
   end
 end

@@ -1,33 +1,9 @@
 require "nokogiri" # must be loaded before awesome_print
 require "awesome_print"
+require "cgi"
+require "csv"
 require "htmlentities"
 require "stringex"
-
-# modify NodeSet to join with SPACE instead of empty string
-class Nokogiri::XML::NodeSet
-  alias :old_inner_html :inner_html
-  alias :old_inner_text :inner_text  
-  
-  def inner_text
-    collect { |i| i.inner_text }.join(" ")
-  end
-  def inner_html *args
-    collect { |i| i.inner_html(*args) }.join(" ")
-  end
-end
-
-# text_just_me
-class Nokogiri::XML::Node
-  def text_just_me
-    t = children.find { |i| i.node_type == Nokogiri::XML::Node::TEXT_NODE }
-    t && t.text
-  end
-end
-class Nokogiri::XML::NodeSet
-  def text_just_me
-    map { |i| i.text_just_me }.join(" ")
-  end
-end
 
 module Sinew
   class Main
@@ -46,7 +22,7 @@ module Sinew
       end
 
       tm = Time.now
-      instance_eval(File.read(file), file)
+      instance_eval(File.read(file, mode: "rb"), file)
       if @path
         Util.banner("Finished #{@path} in #{(Time.now - tm).to_i}s.")
       else
@@ -72,7 +48,7 @@ module Sinew
       # handle params
       body = nil
       if params
-        q = params.map { |key, value| [Sinew.h_maybe(key), Sinew.h_maybe(value)] }.sort
+        q = params.map { |key, value| [CGI.escape(key.to_s), CGI.escape(value.to_s)] }.sort
         q = q.map { |key, value| "#{key}=#{value}" }.join("&")
         if method == :get
           separator = url.include?(??) ? "&" : "?"
@@ -88,12 +64,13 @@ module Sinew
         else
           path = CURLER.post(url, body)
         end
-        @raw = File.open(path, "rb") { |f| f.read }
+        @raw = File.read(path, mode: "rb")
       rescue Curler::Error => e
         $stderr.puts "xxx #{e.message}"
         @raw = ""
       end
 
+      # setup local variables
       @url, @uri = CURLER.url, CURLER.uri
       @html = nil
       @clean = nil
@@ -107,26 +84,26 @@ module Sinew
     #
 
     def html
-      if !@html
-        @html = TextUtil.html_tidy(@raw)
+      @html ||= begin
+        s = TextUtil.html_tidy(@raw)
         nelements = @raw.count("<")
         if nelements > 1
           # is there a problem with tidy?
-          percent = 100 * @html.count("<") / nelements
+          percent = 100 * s.count("<") / nelements
           if percent < 80
             # bad xml processing instruction? Try fixing it.
             maybe = TextUtil.html_tidy(@raw.gsub(/<\?[^>]*?>/, ""))
             new_percent = 100 * maybe.count("<") / nelements
             if new_percent > 80
               # yes!
-              @html = maybe
+              s = maybe
             else
               Util.warning "Hm - it looks like tidy ate some of your file (#{percent}%)" if percent < 90
             end
           end
         end
+        s
       end
-      @html
     end
 
     def clean
@@ -155,7 +132,7 @@ module Sinew
       file = ext.empty? ? "#{file}.csv" : file.gsub(ext, ".csv")
 
       @path = file
-      @csv = CSV.open(file, "w")
+      @csv = CSV.open(file, "wb")
       @csv_keys = args
       @csv << @csv_keys
       Util.banner("Writing to #{@path}...")
@@ -170,7 +147,10 @@ module Sinew
       else
         s = s.to_s
       end
-      s = s.untag.convert_accented_entities.unent.to_ascii.squish
+      s = TextUtil.untag(s)
+      s = s.convert_accented_entities
+      s = TextUtil.unent(s)
+      s = s.to_ascii.squish
       s
     end
 
@@ -186,22 +166,6 @@ module Sinew
       $stderr.puts print.ai if @options[:verbose]
       @csv << row    
       @csv.flush
-    end
-
-    protected
-
-    #
-    # helpers
-    #
-
-    def self.h(s)
-      CGI.escape(s.to_s)
-    end
-
-    def self.h_maybe(s)
-      s = s.to_s
-      s = h(s) if (s !~ /%([A-Za-z0-9]{2})/) && !s.include?("+")
-      s
     end
   end
 end

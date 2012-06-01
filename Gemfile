@@ -1,4 +1,5 @@
 source "http://rubygems.org"
+gemspec
 
 gem "activesupport"
 gem "awesome_print"

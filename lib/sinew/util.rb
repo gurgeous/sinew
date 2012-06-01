@@ -1,15 +1,16 @@
-require "cgi"
-require "csv"
 require "digest/md5"
 require "etc"
 require "fileutils"
-require "open3"
-require "uri"
-require "zlib"
 
 module Sinew
   # Helper module for executing commands and printing stuff
   # out.
+  #
+  # The general idea is to only print commands that are actually
+  # interesting. For example, mkdir_if_necessary won't print anything
+  # if the directory already exists. That way we can scan output and
+  # see what changes were made without getting lost in repetitive
+  # commands that had no actual effect.
   module Util
     class RunError < StandardError ; end
 
@@ -54,61 +55,6 @@ module Sinew
       end
     end
 
-    # Run a command, raise an error upon failure. The output is
-    # captured as a string and returned.
-    def run_capture(command, *args)
-      if !args.empty?
-        args = args.flatten.map { |i| shell_escape(i) }.join(" ")
-        command = "#{command} #{args}"
-      end
-      result = `#{command}`
-      if $? != 0
-        if $?.termsig == Signal.list["INT"]
-          raise "#{command} interrupted"
-        end
-        raise RunError, "#{command} failed : #{$?.to_i / 256} #{result.inspect}"
-      end
-      result
-    end
-
-    # Run a command and split the result into lines, raise an error
-    # upon failure. The output is captured as an array of strings and
-    # returned.
-    def run_capture_lines(command, *args)
-      run_capture(command, args).split("\n")
-    end
-
-    # Run a command but don't send any output to $stdout/$stderr.
-    def run_quietly(command, *args)
-      if !args.empty?
-        args = args.flatten.map { |i| shell_escape(i) }.join(" ")
-        command = "#{command} #{args}"
-      end
-      run("#{command} > /dev/null 2> /dev/null")
-    end
-
-    # Run a command, return true if it succeeds.
-    def succeeds?(command)
-      system("#{command} > /dev/null 2> /dev/null")
-      $? == 0
-    end
-
-    # Run a command, return true if it fails.    
-    def fails?(command)
-      !succeeds?(command)
-    end
-
-    # Escape some text for the shell and enclose it in single quotes
-    # if necessary.
-    def shell_escape(s)
-      s = s.to_s
-      if s !~ /^[0-9A-Za-z+,.\/:=@_-]+$/
-        s = s.gsub("'") { "'\\''" }
-        s = "'#{s}'"
-      end
-      s
-    end
-
     # Like mkdir -p. Optionally, set the owner and mode.
     def mkdir(dir, owner = nil, mode = nil)
       FileUtils.mkdir_p(dir, :verbose => verbose?)
@@ -131,19 +77,6 @@ module Sinew
     # Are two files different?
     def different?(a, b)
       !FileUtils.compare_file(a, b)
-    end
-
-    # Copy perms from src file to dst.
-    def copy_perms(src, dst)
-      stat = File.stat(src)
-      File.chmod(stat.mode, dst)
-    end
-
-    # Copy perms and timestamps from src file to dst.
-    def copy_metadata(src, dst)
-      stat = File.stat(src)
-      File.chmod(stat.mode, dst)
-      File.utime(stat.atime, stat.mtime, dst)
     end
 
     # Copy file or dir from src to dst. Optionally, set the mode and
@@ -241,6 +174,11 @@ module Sinew
       end
     end
 
+    # Touch a file
+    def touch(file)
+      FileUtils.touch(file)      
+    end
+
     # A nice printout in green.
     def banner(s, color = GREEN)
       s = "#{s} ".ljust(72, " ")      
@@ -259,93 +197,12 @@ module Sinew
       exit(1)
     end
 
-    # Who owns this process?
-    def whoami
-      @whoami ||= Etc.getpwuid(Process.uid).name
-    end
-
-    # Returns true if the pkg is installed.
-    def package_is_installed?(pkg)
-      succeeds?("dpkg-query -f='${Status}' -W #{pkg} | grep 'install ok installed' 2> /dev/null")    
-    end
-
-    # Install pkg if necessary.
-    def package_if_necessary(pkg)
-      if !package_is_installed?(pkg)
-        banner "#{pkg}..."
-        run "apt-get -y install #{pkg}"
-      end
-    end
-
-    # Install gem if necessary.
-    def gem_if_necessary(gem)
-      grep = args = nil
-      if gem =~ /(.*)-(\d+\.\d+\.\d+)$/
-        gem, version = $1, $2
-        grep = "^#{gem}.*#{version}"
-        args = " --version #{version}"
-      else
-        grep = "^#{gem}"
-      end
-      if fails?("gem list #{gem} | grep '#{grep}'")
-        banner "#{gem}..."
-        run "gem install #{gem} #{args} --no-rdoc --no-ri"
-        return true
-      end
-      false
-    end
-
-    # Returns true if the pidfile exists and that process id exists as
-    # well.
-    def process_by_pid?(pidfile)
-      begin
-        if File.exists?(pidfile)
-          pid = File.read(pidfile).to_i
-          if pid != 0
-            Process.kill(0, pid)
-            return true
-          end
-        end
-      rescue Errno::ENOENT, Errno::ESRCH
-      end
-      false
-    end
-
-    # Calculate the md5 checksum for a file
-    def md5sum(path)
-      digest, buf = Digest::MD5.new, ""
-      File.open(path) do |f|
-        while f.read(4096, buf)
-          digest.update(buf)
-        end
-      end
-      digest.hexdigest
-    end
-
-    # Read a CSV file
-    def csv(path)
-      if path =~ /\.gz$/
-        lines = Zlib::GzipReader.open(path) { |f| CSV.parse(f) }
-      else
-        lines = CSV.read(path)
-      end
-      keys = lines.shift.map(&:to_sym)
-      clazz = Struct.new(*keys)
-      lines.map { |i| clazz.new(*i) }
-    end
-
-    # Decompress a gzipped file and return the contents
-    def decompress(path)
-      File.open(path) { |f| Zlib::GzipReader.new(f).read }
-    end
-
     # Generate some random text
     def random_text(len)
-      str = ""
       chars = ("A".."Z").to_a + ("a".."z").to_a + ("0".."9").to_a
       (1..len).map { chars[rand(chars.length - 1)] }.join("")
     end
-
+    
     # Convert a string into something that could be a path segment
     def pathify(s)
       s = s.gsub(/^\//, "")
@@ -360,7 +217,7 @@ module Sinew
       s
     end
 
-    # checksum some text
+    # checksum some text    
     def md5(s)
       Digest::MD5.hexdigest(s.to_s)
     end

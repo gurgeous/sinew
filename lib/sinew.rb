@@ -1,5 +1,6 @@
 require "sinew/version"
 require "sinew/util"
 require "sinew/curler"
+require "sinew/nokogiri_ext"
 require "sinew/text_util"
 require "sinew/main"
