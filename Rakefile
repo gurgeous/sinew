@@ -1,8 +1,6 @@
 require "bundler"
 require "bundler/setup"
-
 require "rake"
-require "rdoc/task"
 
 $LOAD_PATH << File.expand_path("../lib", __FILE__)
 require "sinew/version"
@@ -24,16 +22,6 @@ task :release => :build do
   system "git tag -a #{Sinew::VERSION} -m 'Tagging #{Sinew::VERSION}'"
   system "git push --tags"
   system "gem push sinew-#{Sinew::VERSION}.gem"
-end
-
-#
-# rdoc
-#
-
-RDoc::Task.new do |rdoc|
-  rdoc.rdoc_dir = "rdoc"
-  rdoc.title = "sinew #{Sinew::VERSION}"
-  rdoc.rdoc_files.include("lib/**/*.rb")
 end
 
 task :default => :gem
