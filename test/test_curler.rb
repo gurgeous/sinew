@@ -48,12 +48,23 @@ module Sinew
     end
 
     def test_rate_limit
-      tm = Time.now
+      slept = false
+      
+      # change Kernel#sleep to not really sleep!
+      Kernel.send(:alias_method, :old_sleep, :sleep)
+      Kernel.send(:define_method, :sleep) do |x|
+        slept = true
+      end
+
       Util.stub(:run, mock_curl_200) do
         @curler.get("http://www.example.com/1")
         @curler.get("http://www.example.com/2")
       end
-      assert(Time.now - tm > 1)
+      assert(slept)
+
+      # restore old Kernel#sleep
+      Kernel.send(:alias_method, :sleep, :old_sleep)
+      Kernel.send(:undef_method, :old_sleep)
     end
   end
 end
