@@ -13,73 +13,17 @@ module Sinew
 
     def initialize(options)
       @options = options.dup
-      @csv = @path = nil
-
-      @curler = Curler.new(user_agent: "sinew/#{VERSION}")
-
-      file = @options[:file]
-      if !File.exists?(file)
-        Util.fatal("#{file} not found")
-      end
-
-      tm = Time.now
-      instance_eval(File.read(file, mode: "rb"), file)
-      if @path
-        Util.banner("Finished #{@path} in #{(Time.now - tm).to_i}s.")
-      else
-        Util.banner("Finished in #{(Time.now - tm).to_i}s.")
-      end
+      _run if !@options[:test]
     end
 
     def get(url, params = nil)
-      http(url, params, :get)
+      _http(url, params, :get)
     end
     
     def post(url, params = nil)
-      http(url, params, :post)
+      _http(url, params, :post)
     end
 
-    def http(url, params, method)
-      url = url.to_s
-      raise "invalid url #{url.inspect}" if url !~ /^http/i
-
-      # decode entities
-      url = CODER.decode(url)
-
-      # handle params
-      body = nil
-      if params
-        q = params.map { |key, value| [CGI.escape(key.to_s), CGI.escape(value.to_s)] }.sort
-        q = q.map { |key, value| "#{key}=#{value}" }.join("&")
-        if method == :get
-          separator = url.include?(??) ? "&" : "?"
-          url = "#{url}#{separator}#{q}"
-        else
-          body = q
-        end
-      end
-
-      begin
-        if method == :get
-          path = @curler.get(url)
-        else
-          path = @curler.post(url, body)
-        end
-        @raw = File.read(path, mode: "rb")
-      rescue Curler::Error => e
-        $stderr.puts "xxx #{e.message}"
-        @raw = ""
-      end
-
-      # setup local variables
-      @url, @uri = @curler.url, @curler.uri
-      @html = nil
-      @clean = nil
-      @noko = nil
-
-      nil
-    end
-    
     #
     # lazy accessors for cleaned up version
     #
@@ -136,10 +80,92 @@ module Sinew
       @csv = CSV.open(file, "wb")
       @csv_keys = args
       @csv << @csv_keys
-      Util.banner("Writing to #{@path}...")
+      _banner("Writing to #{@path}...")
     end
 
-    def normalize(key, s)
+    def csv_emit(row, options = {})
+      csv_header(row.keys.sort) if !@csv
+
+      print = { }
+      row = @csv_keys.map do |i|
+        s = _normalize(row[i], i)
+        print[i] = s if !s.empty?
+        s
+      end
+      $stderr.puts print.ai if @options[:verbose]
+      @csv << row    
+      @csv.flush
+    end
+
+    protected
+
+    def _curler
+      @curler ||= begin
+        # curler
+        options = { user_agent: "sinew/#{VERSION}" }
+        options[:dir] = @options[:cache] if @options[:cache]
+        options[:verbose] = false if @options[:quiet]
+        Curler.new(options)
+      end
+    end
+
+    def _run
+      @csv = @path = nil
+      
+      file = @options[:file]
+      if !File.exists?(file)
+        Util.fatal("#{file} not found")
+      end
+
+      tm = Time.now
+      instance_eval(File.read(file, mode: "rb"), file)
+      if @path
+        _banner("Finished #{@path} in #{(Time.now - tm).to_i}s.")
+      else
+        _banner("Finished in #{(Time.now - tm).to_i}s.")
+      end
+    end
+
+    def _http(url, params, method)
+      url = url.to_s
+      raise "invalid url #{url.inspect}" if url !~ /^http/i
+
+      # decode entities
+      url = CODER.decode(url)
+
+      # handle params
+      body = nil
+      if params
+        q = params.map { |key, value| [CGI.escape(key.to_s), CGI.escape(value.to_s)] }.sort
+        q = q.map { |key, value| "#{key}=#{value}" }.join("&")
+        if method == :get
+          separator = url.include?(??) ? "&" : "?"
+          url = "#{url}#{separator}#{q}"
+        else
+          body = q
+        end
+      end
+
+      begin
+        if method == :get
+          path = _curler.get(url)
+        else
+          path = _curler.post(url, body)
+        end
+        @raw = File.read(path, mode: "rb")
+      rescue Curler::Error => e
+        $stderr.puts "xxx #{e.message}"
+        @raw = ""
+      end
+
+      # setup local variables
+      @url, @uri = _curler.url, _curler.uri
+      @html = nil
+      @clean = nil
+      @noko = nil
+    end
+    
+    def _normalize(s, key = nil)
       case s
       when Nokogiri::XML::Element, Nokogiri::XML::NodeSet
         s = s.inner_html
@@ -155,18 +181,8 @@ module Sinew
       s
     end
 
-    def csv_emit(row, options = {})
-      csv_header(row.keys.sort) if !@csv
-
-      print = { }
-      row = @csv_keys.map do |i|
-        s = normalize(i, row[i])
-        print[i] = s if !s.empty?
-        s
-      end
-      $stderr.puts print.ai if @options[:verbose]
-      @csv << row    
-      @csv.flush
+    def _banner(s)
+      Util.banner(s) if !@options[:quiet]
     end
   end
 end

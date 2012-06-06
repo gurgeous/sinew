@@ -8,7 +8,9 @@ raise "Sinew requires Ruby 1.9 or higher" if RUBY_VERSION < "1.9"
 # ARGV
 options = Trollop.options do
   banner "Usage: sinew [options] <gub.sinew>"
+  opt :cache, "Set the cache directory (defaults to ~/.sinew)"
   opt :verbose, "Dump every row"
+  opt :quiet, "Be quiet"
 end
 Trollop.die "need a .sinew file to run against" if ARGV.blank?
 
