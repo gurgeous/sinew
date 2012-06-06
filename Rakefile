@@ -1,6 +1,7 @@
 require "bundler"
 require "bundler/setup"
 require "rake"
+require "rake/testtask"
 
 $LOAD_PATH << File.expand_path("../lib", __FILE__)
 require "sinew/version"
@@ -24,7 +25,15 @@ task :release => :build do
   system "gem push sinew-#{Sinew::VERSION}.gem"
 end
 
-task :default => :gem
+#
+# minitest
+#
+
+Rake::TestTask.new(:test) do |test|
+  test.libs << "test"
+end
+
+task :default => :test
 
 # to test:
 # block ; rake install && rm -rf ~/.sinew/www.amazon.com && /usr/local/bin/sinew sample.sinew
