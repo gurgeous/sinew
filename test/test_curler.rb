@@ -62,5 +62,14 @@ module Sinew
         assert_equal("http://www.gub.com", @curler.url)
       end
     end
+
+    def test_rate_limit
+      tm = Time.now
+      Util.stub(:run, @curl_200) do
+        @curler.get("http://www.example.com/1")
+        @curler.get("http://www.example.com/2")
+      end
+      assert(Time.now - tm > 1)
+    end
   end
 end
