@@ -3,6 +3,8 @@
 require "sinew"
 require "trollop"
 
+raise "Sinew requires Ruby 1.9 or higher" if RUBY_VERSION < "1.9"
+
 # ARGV
 options = Trollop.options do
   banner "Usage: sinew [options] <gub.sinew>"
