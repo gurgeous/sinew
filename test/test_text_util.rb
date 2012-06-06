@@ -2,14 +2,10 @@ require "helper"
 
 module Sinew
   class TestTextUtil < TestCase
-    def setup
-      tidy = TextUtil.html_tidy(HTML)
-    end
-    
     def test_tidy
       tidy = TextUtil.html_tidy(HTML)
       # tags removed?
-      assert(tidy !~ /script|meta|link/)
+      assert(tidy !~ /script|meta/)
       # squished?
       assert(tidy !~ /  /)
       # comments removed?

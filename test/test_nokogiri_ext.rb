@@ -3,7 +3,7 @@ require "helper"
 module Sinew
   class TestNokogiriExt < TestCase
     def setup
-      @noko = Nokogiri::HTML(HTML)
+      @noko = Nokogiri::HTML(HTML).css("#nokogiri_ext")
     end
     
     def test_inner_text
