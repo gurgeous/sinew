@@ -4,6 +4,12 @@ Sinew collects structured data from web sites (screen scraping). It provides a R
 
 Sinew requires Ruby 1.9, [HTML Tidy](http://tidy.sourceforge.net) and [Curl](http://curl.haxx.se).
 
+Sinew is distributed as a ruby gem:
+
+```ruby
+gem install sinew
+```
+
 ## Example
 
 Here's an example for collecting Amazon's bestseller list:
