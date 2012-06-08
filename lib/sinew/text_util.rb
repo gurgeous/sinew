@@ -14,8 +14,6 @@ module Sinew
       "-wrap" =>  0,
       "--doctype" => "omit",
       "--hide-comments" => "yes",
-      "--numeric-entities" => "no",
-      "--preserve-entities" => "yes",
       "--force-output" => "yes",    
       "-f" => "/dev/null",
     }
@@ -47,6 +45,7 @@ module Sinew
     def html_tidy(s)
       # run tidy
       args = TIDY_OPTIONS.map { |k, v| "#{k} #{v}" }.join(" ")
+      puts "tidy #{args}"
       s = IO.popen("tidy #{args}", "rb+") do |f|
         f.write(s)
         f.close_write
