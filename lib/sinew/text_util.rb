@@ -45,7 +45,6 @@ module Sinew
     def html_tidy(s)
       # run tidy
       args = TIDY_OPTIONS.map { |k, v| "#{k} #{v}" }.join(" ")
-      puts "tidy #{args}"
       s = IO.popen("tidy #{args}", "rb+") do |f|
         f.write(s)
         f.close_write
