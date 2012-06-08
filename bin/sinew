@@ -3,7 +3,16 @@
 require "sinew"
 require "trollop"
 
-raise "Sinew requires Ruby 1.9 or higher" if RUBY_VERSION < "1.9"
+# check requirements
+if RUBY_VERSION < "1.9"
+  Sinew::Util.fatal "Sorry, Sinew requires Ruby 1.9 or higher. Please install it."
+end
+%w(curl tidy).each do |i|
+  system("which #{i} > /dev/null")
+  if $? != 0
+    Sinew::Util.fatal "Sorry, Sinew requires #{i}. Please install it."
+  end
+end
 
 # ARGV
 options = Trollop.options do
