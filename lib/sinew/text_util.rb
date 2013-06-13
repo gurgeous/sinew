@@ -37,11 +37,14 @@ module Sinew
                                                  "&#160;" => " ",
                                                  "&#8232;" => "\n"
                                                  )
-    
+    ACCENTED_ENTITIES = [
+      "grave", "acute", "circ", "tilde", "uml", "ring", "cedil", "slash"
+    ]
+
     #
     # tidy/clean
     #
-    
+
     def html_tidy(s)
       # run tidy
       args = TIDY_OPTIONS.map { |k, v| "#{k} #{v}" }.join(" ")
@@ -91,11 +94,15 @@ module Sinew
     end
 
     def untag(s)
-      s.gsub(/<[^>]+>/, " ")    
+      s.gsub(/<[^>]+>/, " ")
     end
 
     def unent(s)
       s.gsub(/&#?[a-z0-9]{2,};/) { |i| COMMON_ENTITIES_INV[i] }
+    end
+
+    def convert_accented_entities(s)
+      s.sub(/&([A-Za-z])(#{ACCENTED_ENTITIES.join('|')});/, '\1')
     end
   end
 end

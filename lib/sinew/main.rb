@@ -175,7 +175,7 @@ module Sinew
         s = s.to_s
       end
       s = TextUtil.untag(s)
-      s = s.convert_accented_entities
+      s = TextUtil.convert_accented_entities(s)
       s = TextUtil.unent(s)
       s = s.to_ascii.squish
       s
