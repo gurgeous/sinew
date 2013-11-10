@@ -19,7 +19,7 @@ module Sinew
     def get(url, params = nil)
       _http(url, params, :get)
     end
-    
+
     def post(url, params = nil)
       _http(url, params, :post)
     end
@@ -93,7 +93,7 @@ module Sinew
         s
       end
       $stderr.puts print.ai if @options[:verbose]
-      @csv << row    
+      @csv << row
       @csv.flush
     end
 
@@ -111,7 +111,7 @@ module Sinew
 
     def _run
       @csv = @path = nil
-      
+
       file = @options[:file]
       if !File.exists?(file)
         Util.fatal("#{file} not found")
@@ -164,7 +164,7 @@ module Sinew
       @clean = nil
       @noko = nil
     end
-    
+
     def _normalize(s, key = nil)
       case s
       when Nokogiri::XML::Element, Nokogiri::XML::NodeSet
@@ -175,7 +175,7 @@ module Sinew
         s = s.to_s
       end
       s = TextUtil.untag(s)
-      s = s.convert_accented_entities
+      s = s.convert_accented_html_entities
       s = TextUtil.unent(s)
       s = s.to_ascii.squish
       s
