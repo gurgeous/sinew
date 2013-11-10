@@ -29,7 +29,7 @@ noko.css("ul li a").each do |a|
 end
 ```
 
-If you paste this into a file called `bestsellers.sinew` and run `sinew bestsellers.sinew`, it will create a `bestsellers.csv` file containing the url, title and img for each bestseller.
+If you paste this into a file called `sample.sinew` and run `sinew sample.sinew`, it will create a `sample.csv` file containing the href and text for each link.
 
 ## How does Sinew differ from Mechanize?
 
