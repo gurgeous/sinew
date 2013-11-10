@@ -12,20 +12,18 @@ gem install sinew
 
 ## Example
 
-Here's an example for collecting Amazon's bestseller list:
+Here's an example for collecting the links from httpbin.org:
 
 ```ruby
 # get the url
-get "http://www.amazon.com/gp/bestsellers/books/ref=sv_b_3"
+get "http://httpbin.org"
 
-# use nokogiri to find books
-noko.css(".zg_itemRow").each do |item|
-  # pull out the stuff we care about using nokogiri
+# use nokogiri to collect links
+noko.css("ul li a").each do |a|
   row = { }
-  row[:url] = item.css(".zg_title a").first[:href]
-  row[:title] = item.css(".zg_title")
-  row[:img] = item.css(".zg_itemImage_normal img").first[:src]
-  
+  row[:url] = a[:href]
+  row[:title] = a.text
+
   # append a row to the csv
   csv_emit(row)
 end
