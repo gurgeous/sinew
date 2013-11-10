@@ -1,8 +1,7 @@
-get "http://www.amazon.com/gp/bestsellers/books/ref=sv_b_3"
-noko.css(".zg_itemRow").each do |item|
+get "http://httpbin.org"
+noko.css("ul li a").each do |a|
   row = { }
-  row[:url] = item.css(".zg_title a").first[:href]
-  row[:title] = item.css(".zg_title")
-  row[:img] = item.css(".zg_itemImage_normal img").first[:src]
+  row[:url] = a[:href]
+  row[:title] = a.text
   csv_emit(row)
 end
