@@ -6,6 +6,7 @@ Gem::Specification.new do |s|
   s.name        = "sinew"
   s.version     = Sinew::VERSION
   s.platform    = Gem::Platform::RUBY
+  s.license     = "MIT"
   s.authors     = ["Adam Doppelt"]
   s.email       = ["amd@gurge.com"]
   s.homepage    = "http://github.com/gurgeous/sinew"
