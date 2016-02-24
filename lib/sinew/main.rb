@@ -88,7 +88,7 @@ module Sinew
 
       print = { }
       row = @csv_keys.map do |i|
-        s = _normalize(row[i], i)
+        s = _normalize(row[i], i, options)
         print[i] = s if !s.empty?
         s
       end
@@ -165,7 +165,7 @@ module Sinew
       @noko = nil
     end
 
-    def _normalize(s, key = nil)
+    def _normalize(s, key = nil, options = {})
       case s
       when Nokogiri::XML::Element, Nokogiri::XML::NodeSet
         s = s.inner_html
@@ -177,7 +177,11 @@ module Sinew
       s = TextUtil.untag(s)
       s = s.convert_accented_html_entities
       s = TextUtil.unent(s)
-      s = s.to_ascii.squish
+      if options[:preserve_unicode_characters]
+        s = s.squish
+      else
+        s = s.to_ascii.squish
+      end
       s
     end
 
