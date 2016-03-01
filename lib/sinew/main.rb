@@ -177,11 +177,8 @@ module Sinew
       s = TextUtil.untag(s)
       s = s.convert_accented_html_entities
       s = TextUtil.unent(s)
-      if options[:preserve_unicode_characters]
-        s = s.squish
-      else
-        s = s.to_ascii.squish
-      end
+      s = s.to_ascii if !options[:preserve_unicode_characters]
+      s = s.squish
       s
     end
 
