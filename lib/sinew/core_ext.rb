@@ -54,6 +54,6 @@ end
 
 class String
   def blank?
-    /\A\s*\z/.match?(self)
+    !!(self =~ /\A\s*\z/)
   end
 end
