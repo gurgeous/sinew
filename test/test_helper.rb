@@ -74,14 +74,14 @@ class MiniTest::Test
 
     # args
     response[:args] = if request.uri.query
-      CGI.parse(request.uri.query).transform_values(&:first)
+      CGI.parse(request.uri.query).map { |k, v| [k, v.first] }.to_h
     else
       {}
     end
 
     # form
     if request.headers['Content-Type'] == 'application/x-www-form-urlencoded'
-      response[:form] = CGI.parse(request.body).transform_values(&:first)
+      response[:form] = CGI.parse(request.body).map { |k, v| [k, v.first] }.to_h
     end
 
     # json

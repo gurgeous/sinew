@@ -67,7 +67,7 @@ module Sinew
       body_key = if body.is_a?(Hash)
         HTTParty::HashConversions.to_params(body)
       else
-        body.dup
+        body&.dup
       end
 
       # build key, as a hash for before_generate_cache_key

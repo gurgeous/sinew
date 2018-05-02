@@ -14,7 +14,21 @@ or in your Gemfile:
 gem 'sinew'
 ```
 
-### Sinew 2 (May 2018)
+## Table of Contents
+
+<!---
+markdown-toc --no-firsth1 --maxdepth 1 readme.md
+-->
+
+[Sinew 2 (May 2018)](#sinew-2-may-2018)
+[Quick Example](#quick-example)
+[How it Works](#how-it-works)
+[DSL Reference](#dsl-reference)
+[Hints](#hints)
+[Limitations](#limitations)
+[Changelog](#changelog)
+
+## Sinew 2 (May 2018)
 
 I am pleased to announce the release of Sinew 2.0, a complete rewrite of Sinew for the modern era. Enhancements include:
 
