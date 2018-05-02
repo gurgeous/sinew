@@ -1,6 +1,10 @@
-require "sinew/version"
-require "sinew/util"
-require "sinew/curler"
-require "sinew/nokogiri_ext"
-require "sinew/text_util"
-require "sinew/main"
+require_relative 'sinew/cache'
+require_relative 'sinew/core_ext'
+require_relative 'sinew/dsl'
+require_relative 'sinew/main'
+require_relative 'sinew/nokogiri_ext'
+require_relative 'sinew/output'
+require_relative 'sinew/request'
+require_relative 'sinew/response'
+require_relative 'sinew/runtime_options'
+require_relative 'sinew/version'

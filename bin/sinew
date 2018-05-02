@@ -1,29 +1,49 @@
 #!/usr/bin/env ruby
 
-require "sinew"
-require "trollop"
+$LOAD_PATH.unshift("#{__dir__}/../lib")
 
-# check requirements
-if RUBY_VERSION < "1.9"
-  Sinew::Util.fatal "Sorry, Sinew requires Ruby 1.9 or higher. Please install it."
-end
-%w(curl tidy).each do |i|
-  system("which #{i} > /dev/null")
-  if $? != 0
-    Sinew::Util.fatal "Sorry, Sinew requires #{i}. Please install it."
+require 'sinew'
+require 'slop'
+
+#
+# options
+#
+
+options = Slop.parse do |o|
+  o.banner = 'Usage: sinew [options] <gub.sinew>'
+  o.bool '-v', '--verbose', 'dump every row'
+  o.bool '--version', 'show version'
+  o.bool '-q', '--quiet', 'suppress some output'
+  o.string '--cache', 'Set the cache directory (defaults to ~/.sinew)', default: "#{ENV['HOME']}/.sinew"
+  o.on '--help' do
+    puts o
+    exit
   end
 end
 
-# ARGV
-options = Trollop.options do
-  banner "Usage: sinew [options] <gub.sinew>"
-  opt :cache, "Set the cache directory (defaults to ~/.sinew)"
-  opt :verbose, "Dump every row"
-  opt :quiet, "Be quiet"
+if options[:version]
+  puts Sinew::VERSION
+  exit
 end
-Trollop.die "need a .sinew file to run against" if ARGV.blank?
 
-# now run!
-ARGV.each do |i|
-  Sinew::Main.new(options.merge(file: i))
+#
+# recipe
+#
+
+recipe = options.arguments.first
+if !recipe
+  Scripto.fatal('need a .sinew file to run against')
 end
+if !File.exist?(recipe)
+  Scripto.fatal("#{recipe} not found")
+end
+if options.arguments.length > 1
+  Scripto.fatal('can only run on one .sinew file')
+end
+options = options.to_h.merge(recipe: recipe)
+
+#
+# main
+#
+
+Sinew::Main.new(options).run

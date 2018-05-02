@@ -1,101 +1,46 @@
-# encoding: UTF-8
+require_relative 'test_helper'
 
-require "helper"
-
-module Sinew
-  class TestMain < TestCase
-    RECIPE = "#{TMP}/test.sinew"
-    CSV    = "#{TMP}/test.csv"    
-
-    def setup
-      # create TMP dir
-      FileUtils.rm_rf(TMP) if File.exists?(TMP)
-      FileUtils.mkdir_p(TMP)
-    end
-
-    def run_recipe(recipe)
-      File.write(RECIPE, recipe)
-      Util.stub(:run, mock_curl_200) do
-        Sinew::Main.new(cache: TMP, file: RECIPE, quiet: true)
+class TestMain < MiniTest::Test
+  def test_noko
+    run_recipe <<~'EOF'
+      get 'http://httpbin.org/html'
+      noko.css("h1").each do |h1|
+        csv_emit(h1: h1.text)
       end
+    EOF
+    assert_equal("h1\nHerman Melville - Moby-Dick\n", File.read(CSV))
+  end
+
+  def test_raw
+    run_recipe <<~'EOF'
+      get "http://httpbin.org/html"
+      raw.scan(/<h1>([^<]+)/) do
+        csv_emit(h1: $1)
+      end
+    EOF
+    assert_equal("h1\nHerman Melville - Moby-Dick\n", File.read(CSV))
+  end
+
+  def test_rate_limit
+    # true network requests call sleep for timeouts, which interferes with our
+    # instrumentation of Kernel#sleep
+    skip if test_network?
+
+    slept = false
+
+    # change Kernel#sleep to not really sleep!
+    Kernel.send(:alias_method, :old_sleep, :sleep)
+    Kernel.send(:define_method, :sleep) do |_duration|
+      slept = true
     end
 
-    def test_noko
-      run_recipe <<'EOF'
-get "http://www.example.com"
-csv_header(:class, :text)
-noko.css("#main span").each do |span|
-  csv_emit(class: span[:class], text: span.text)
-end
-EOF
-      assert_equal("class,text\nclass1,text1\nclass2,text2\n", File.read(CSV))
-    end
+    sinew.runtime_options.rate_limit = 1
+    sinew.dsl.get('http://httpbin.org/html')
+    sinew.dsl.get('http://httpbin.org/get')
+    assert(slept)
 
-    def test_raw
-      # test javascript, which is only crawlable with raw
-      run_recipe <<'EOF'
-get "http://www.example.com"
-raw.scan(/alert\("([^"]+)/) do
-  csv_emit(alert: $1)
-end
-EOF
-      assert_equal("alert\nalert 1\nalert 2\n", File.read(CSV))
-    end
-
-    def test_html
-      # note the cleaned up whitespace
-      run_recipe <<'EOF'
-get "http://www.example.com"
-csv_header(:class, :text)
-html.scan(/<span class="(\w+)">(\w+)/) do
-  csv_emit(class: $1, text: $2)
-end
-EOF
-      assert_equal("class,text\nclass1,text1\nclass2,text2\n", File.read(CSV))
-    end
-
-    def test_clean
-      # note the removed attributes from span
-      run_recipe <<'EOF'
-get "http://www.example.com"
-clean.scan(/<span>(text\d)/) do
-  csv_emit(text: $1)
-end
-EOF
-      assert_equal("text\ntext1\ntext2\n", File.read(CSV))      
-    end
-
-    def test_normalize
-      s = Sinew::Main.new(test: true)
-
-      #
-      # non-strings
-      #
-      
-      noko = Nokogiri::HTML(HTML).css("#main")      
-      # node => text
-      assert_equal("text", s.send(:_normalize, noko.css("#element")))
-      # nodes => text joined with space
-      assert_equal("text1 text2", s.send(:_normalize, noko.css(".e")))
-      # array => text joined with pipe
-      assert_equal("1|2", s.send(:_normalize, [1,2]))
-
-      #
-      # string cleanups
-      #
-      
-      # untag
-      assert_equal("gub", s.send(:_normalize, "<tag>gub</tag>"))
-      # convert_accented_entities
-      assert_equal("a", s.send(:_normalize, "&aacute;"))
-      # unent
-      assert_equal("<>", s.send(:_normalize, "&lt;&gt;"))
-      # to_ascii
-      assert_equal("cafe", s.send(:_normalize, "caf\xc3\xa9"))
-      # squish
-      assert_equal("hello world", s.send(:_normalize, "\nhello \t \rworld"))
-    end
+    # restore old Kernel#sleep
+    Kernel.send(:alias_method, :sleep, :old_sleep)
+    Kernel.send(:undef_method, :old_sleep)
   end
 end
-
-

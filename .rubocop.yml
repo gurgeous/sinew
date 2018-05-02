@@ -1,0 +1,49 @@
+AllCops:
+  Exclude:
+  TargetRubyVersion: 2.3
+
+# amd: customizations
+Layout/SpaceInsideArrayLiteralBrackets:
+  EnforcedStyle: compact
+Layout/CaseIndentation:
+  EnforcedStyle: end
+Layout/EndAlignment:
+  EnforcedStyleAlignWith: variable
+Style/CollectionMethods:
+  Enabled: true
+  PreferredMethods:
+    reduce: inject
+Style/EmptyMethod:
+  Enabled: false
+Style/TrailingCommaInArrayLiteral:
+  EnforcedStyleForMultiline: consistent_comma
+Style/TrailingCommaInHashLiteral:
+  EnforcedStyleForMultiline: consistent_comma
+
+# amd: these seem extreme
+Lint/AssignmentInCondition: { Enabled: false } # I do this all the time
+Lint/HandleExceptions: { Enabled: false } # blank rescues are useful
+Naming/BinaryOperatorParameterName: { Enabled: false } # silly
+Naming/HeredocDelimiterNaming: { Enabled: false } # silly
+Naming/UncommunicativeMethodParamName: { Enabled: false } # silly
+Performance/RegexpMatch: { Enabled: false } # =~ is fine
+Performance/TimesMap: { Enabled: false } # silly
+Style/ClassAndModuleChildren: { Enabled: false } # silly
+Style/Documentation: { Enabled: false } # we don't need this
+Style/DoubleNegation: { Enabled: false } # silly
+Style/FormatStringToken: { Enabled: false } # we like printf here
+Style/FrozenStringLiteralComment: { Enabled: false } # seems excessive
+Style/GuardClause: { Enabled: false } # confusing
+Style/IfUnlessModifier: { Enabled: false } # personally I hate unless
+Style/NegatedIf: { Enabled: false } # these are fine
+Style/Next: { Enabled: false } # these are fine
+Style/NumericPredicate: { Enabled: false } # silly
+Style/ParallelAssignment: { Enabled: false } # these are fine
+Style/PerlBackrefs: { Enabled: false } # these are fine
+Style/RaiseArgs: { Enabled: false } # silly
+Style/RegexpLiteral: { Enabled: false } # these are fine
+Style/StderrPuts: { Enabled: false } # this is awful
+
+# amd: these Metric rules are annoying, disable
+Metrics:
+  Enabled: false
