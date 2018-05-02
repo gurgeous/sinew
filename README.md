@@ -20,13 +20,13 @@ gem 'sinew'
 markdown-toc --no-firsth1 --maxdepth 1 readme.md
 -->
 
-[Sinew 2 (May 2018)](#sinew-2-may-2018)
-[Quick Example](#quick-example)
-[How it Works](#how-it-works)
-[DSL Reference](#dsl-reference)
-[Hints](#hints)
-[Limitations](#limitations)
-[Changelog](#changelog)
+* [Sinew 2 (May 2018)](#sinew-2-may-2018)
+* [Quick Example](#quick-example)
+* [How it Works](#how-it-works)
+* [DSL Reference](#dsl-reference)
+* [Hints](#hints)
+* [Limitations](#limitations)
+* [Changelog](#changelog)
 
 ## Sinew 2 (May 2018)
 
@@ -76,7 +76,7 @@ get "https://www.google.com/search?q=darwin"
 get "https://www.google.com/search", q: "charles darwin"
 ```
 
-Once you've done a `get`, you have access to the document in a few different formats (see [Parsing](#wiki-dsl-parsing) for details). In general, it's easiest to use `noko` to automatically parse and interact with the results. If Nokogiri isn't appropriate, you can fall back to regular expressions run against `raw` or `html`. Use `json` if you are expecting a JSON response.
+Once you've done a `get`, you have access to the document in a few different formats. In general, it's easiest to use `noko` to automatically parse and interact with the results. If Nokogiri isn't appropriate, you can fall back to regular expressions run against `raw` or `html`. Use `json` if you are expecting a JSON response.
 
 ```ruby
 get "https://www.google.com/search?q=darwin"
