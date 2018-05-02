@@ -18,8 +18,7 @@ gem 'sinew'
 
 I am pleased to announce the release of Sinew 2.0, a complete rewrite of Sinew for the modern era. Enhancements include:
 
-* Switch to HTTPParty instead of Curl.
-* Remove dependencies on Tidy and ActiveSupport.
+* Remove dependencies on active_support, curl and tidy. We use HTTParty now.
 * Much easier to customize requests in `.sinew` files. For example, setting User-Agent or Bearer tokens.
 * More operations like `post_json` or the generic `http`. These methods are thing wrappers around HTTParty.
 * New end-of-run report.
@@ -29,7 +28,7 @@ I am pleased to announce the release of Sinew 2.0, a complete rewrite of Sinew f
 
 Sinew uses a new format for cached responses. Old Sinew 1 cache directories must be removed before running Sinew again. Sinew 2 might choke on Sinew 1 cache directores when reading `head/`. This is not tested or supported.
 
-## Example
+## Quick Example
 
 Here's an example for collecting the links from httpbin.org:
 
@@ -50,16 +49,125 @@ end
 
 If you paste this into a file called `sample.sinew` and run `sinew sample.sinew`, it will create a `sample.csv` file containing the href and text for each link.
 
-## How does Sinew differ from Mechanize?
+## How it Works
 
-I'm not an expert on Mechanize, but this question has come up repeatedly and I'll try to address it. Mechanize is a great toolkit and it's better for some situations. Briefly:
+There are three main features provided by Sinew.
 
-* Sinew caches all HTTP requests on disk. That makes it possible to iterate quickly. Crawl once and then continue to work on your recipe. Run the recipe over and over while you tune your CSS selectors and regular expressions.
-* Sinew runs responses through [HTML Tidy](http://tidy.sourceforge.net). This cleans up dirty HTML and makes it easier to parse in many cases, especially if you have to fallback to regular expressions instead of Nokogiri. Unfortunately, this is a common use case in my experience.
-* Sinew outputs CSV files. It does exactly one thing and it does it well - Sinew crawls a site and outputs a CSV file. Mechanize is a more general toolkit.
+#### The Sinew DSL
 
-## Full Documentation
+Sinew uses recipe files to crawl web sites. Recipes have the `.sinew` extension, but they are plain old Ruby. The [Sinew DSL](#dsl) makes crawling easy. Use `get` to make an HTTP GET:
 
-Full docs are in the wiki:
+```ruby
+get "https://www.google.com/search?q=darwin"
+get "https://www.google.com/search", q: "charles darwin"
+```
 
-https://github.com/gurgeous/sinew/wiki
+Once you've done a `get`, you have access to the document in a few different formats (see [Parsing](#wiki-dsl-parsing) for details). In general, it's easiest to use `noko` to automatically parse and interact with the results. If Nokogiri isn't appropriate, you can fall back to regular expressions run against `raw` or `html`. Use `json` if you are expecting a JSON response.
+
+```ruby
+get "https://www.google.com/search?q=darwin"
+
+# pull out the links with nokogiri
+links = noko.css("a").map { |i| i[:href] }
+puts links.inspect
+
+# or, use a regex
+links = html[/<a[^>]+href="([^"]+)/, 1]
+puts links.inspect
+```
+
+#### CSV Output
+
+Recipes output CSV files. To continue the example above:
+
+```ruby
+get "https://www.google.com/search?q=darwin"
+noko.css("a").each do |i|
+  row = { }
+  row[:href] = i[:href]
+  row[:text] = i.text
+  csv_emit row
+end
+```
+
+Sinew creates a CSV file with the same name as the recipe, and `csv_emit(hash)` appends a row. The values of your hash are converted to strings:
+
+1.  Nokogiri nodes are converted to text
+1.  Arrays are joined with "|", so you can separate them later
+1.  HTML tags, entities and non-ascii chars are removed
+1.  Whitespace is squished
+
+#### Caching
+
+Requests are made using HTTParty, and all responses are cached on disk in `~/.sinew`. Error responses are cached as well. Each URL will be hit exactly once, and requests are rate limited to one per second. Sinew tries to be polite.
+
+The files in `~/.sinew` have nice names and are designed to be human readable. This helps when writing recipes. Sinew never deletes files from the cache - that's up to you!
+
+Because all requests are cached, you can run Sinew repeatedly with confidence. Run it over and over again while you build up your recipe.
+
+## DSL Reference
+
+#### Making requests
+
+* `get(url, query = {})` - fetch a url with HTTP GET. URL parameters can be added using `query.
+* `post(url, form = {})` - fetch a url with HTTP POST, using `form` as the POST body.
+* `post_json(url, json = {})` - fetch a url with HTTP POST, using `json` as the POST body.
+* `http(method, url, options = {})` - use this for more complex requests
+
+#### Parsing the response
+
+* `raw` - the raw response from the last request
+* `html` - like `raw`, but with a handful of HTML-specific whitespace cleanups
+* `noko` - a [Nokogiri](http://nokogiri.org) document built from the tidied HTML
+* `json` - parse the response as JSON, with symbolized keys
+* `url` - the url of the last request. If the request goes through a redirect, `url` will reflect the final url.
+* `uri` - the URI of the last request. This is useful for resolving relative URLs.
+
+#### Writing CSV
+
+* `csv_header(keys)` - specify the columns for CSV output. If you don't call this, Sinew will use the keys from the first call to `csv_emit`.
+* `csv_emit(hash)` - append a row to the CSV file
+
+## Hints
+
+Writing Sinew recipes is fun and easy. The builtin caching means you can iterate quickly, since you won't have to re-fetch the data. Here are some hints for writing idiomatic recipes:
+
+* Sinew doesn't (yet) check robots.txt - please check it manually.
+* Prefer Nokogiri over regular expressions wherever possible. Learn [CSS selectors](http://www.w3schools.com/cssref/css_selectors.asp).
+* In Chrome, `$` in the console is your friend.
+* Fallback to regular expressions if you're desperate. Depending on the site, use either `raw` or `html`. `html` is probably your best bet. `raw` is good for crawling Javascript, but it's fragile if the site changes.
+* Learn to love `String#[regexp]`, which is an obscure operator but incredibly handy for Sinew.
+* Laziness is useful. Keep your CSS selectors and regular expressions simple, so maybe they'll work again the next time you need to crawl a site.
+* Don't be afraid to mix CSS selectors, regular expressions, and Ruby:
+
+```ruby
+noko.css("table")[4].css("td").select { |i| i[:width].to_i > 80 }.map(&:text)
+```
+
+* Debug your recipes using plain old `puts`, or better yet use `ap` from [awesome_print](https://github.com/michaeldv/awesome_print).
+* Run `sinew -v` to get a report on every `csv_emit`. Very handy.
+* Add the CSV files to your git repo. That way you can version them and get diffs!
+
+## Limitations
+
+* Caching is based on URL, so use caution with cookies and other forms of authentication
+* Almost no support for international (non-english) characters
+
+## Changelog
+
+#### 2.0.0 (May 2018)
+
+* Complete rewrite. See above.
+
+#### 1.0.3
+
+* Friendlier message if curl or tidy are missing.
+
+#### 1.0.2
+
+* Remove entity options from tidy, which didn't work on MacOS (thanks Rex!)
+
+#### 1.0.1
+
+* Trying to run on 1.8 produces a fatal error. Onward!
+* Added first batch of unit tests
