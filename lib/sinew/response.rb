@@ -6,6 +6,10 @@ module Sinew
   class Response
     attr_accessor :request, :uri, :body, :code, :headers
 
+    #
+    # factory methods
+    #
+
     def self.from_network(request, party_response)
       Response.new.tap do |response|
         response.request = request
@@ -34,6 +38,9 @@ module Sinew
 
         # overwrite with cached response headers
         if head
+          if head !~ /^{/
+            return from_legacy_head(response, head)
+          end
           head = JSON.parse(head, symbolize_names: true)
           response.uri = URI.parse(head[:uri])
           response.code = head[:code]
@@ -51,6 +58,26 @@ module Sinew
         response.headers = {}
       end
     end
+
+    def self.from_legacy_head(response, head)
+      response.tap do |response|
+        case head
+        when /\ACURLER_ERROR/
+          # error
+          response.code = 999
+        when /\AHTTP/
+          # redirect
+          location = head.scan(/Location: ([^\r\n]+)/).flatten.last
+          response.uri += location
+        else
+          $stderr.puts "unknown cached /head for #{response.uri}"
+        end
+      end
+    end
+
+    #
+    # accessors
+    #
 
     def error?
       code >= 400
