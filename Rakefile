@@ -1,27 +1,26 @@
-require "bundler"
-require "bundler/setup"
-require "rake"
-require "rake/testtask"
+require 'bundler'
+require 'bundler/setup'
 
-$LOAD_PATH << File.expand_path("../lib", __FILE__)
-require "sinew/version"
+require 'rake'
+require 'rake/testtask'
+require 'sinew/version'
 
 #
 # gem
 #
 
-task :gem => :build
+task gem: :build
 task :build do
-  system "gem build --quiet sinew.gemspec"
+  system 'gem build --quiet sinew.gemspec'
 end
 
-task :install => :build do
+task install: :build do
   system "sudo gem install --quiet sinew-#{Sinew::VERSION}.gem"
 end
 
-task :release => :build do
+task release: :build do
   system "git tag -a #{Sinew::VERSION} -m 'Tagging #{Sinew::VERSION}'"
-  system "git push --tags"
+  system 'git push --tags'
   system "gem push sinew-#{Sinew::VERSION}.gem"
 end
 
@@ -29,11 +28,11 @@ end
 # minitest
 #
 
-Rake::TestTask.new(:test) do |test|
-  test.libs << "test"
+Rake::TestTask.new(:test) do |t|
+  t.warning = false
 end
 
-task :default => :test
+task default: :test
 
 # to test:
 # block ; rake install && rm -rf ~/.sinew/www.amazon.com && /usr/local/bin/sinew sample.sinew
