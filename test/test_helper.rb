@@ -50,6 +50,7 @@ class MiniTest::Test
     stub_request(:get, %r{http://[^/]+/status/\d+}).to_return(method(:respond_status))
     stub_request(:get, %r{http://[^/]+/(relative-)?redirect/\d+}).to_return(method(:respond_redirect))
     stub_request(:get, %r{http://[^/]+/delay/\d+}).to_timeout
+    stub_request(:get, %r{http://[^/]+/xml}).to_return(method(:respond_xml))
   end
   protected :stub_network
 
@@ -58,7 +59,7 @@ class MiniTest::Test
   #
 
   def respond_html(_request)
-    # this html was carefully chosen to match httpbin.org/html
+    # this html was carefully chosen to somewhat match httpbin.org/html
     html = <<~EOF
       <body>
         <h1>Herman Melville - Moby-Dick</h1>
@@ -68,20 +69,37 @@ class MiniTest::Test
   end
   protected :respond_html
 
+  def respond_xml(_request)
+    # this xml was carefully chosen to somewhat match httpbin.org/xml
+    xml = <<~EOF
+      <!--   A SAMPLE set of slides   -->
+      <slideshow>
+        <slide type="all">
+          <title>Wake up to WonderWidgets!</title>
+        </slide>
+        <slide type="all">
+          <title>Overview</title>
+        </slide>
+      </slideshow>
+    EOF
+    { body: xml }
+  end
+  protected :respond_xml
+
   def respond_echo(request)
     response = {}
     response[:headers] = request.headers
 
     # args
     response[:args] = if request.uri.query
-      CGI.parse(request.uri.query).map { |k, v| [k, v.first] }.to_h
+      CGI.parse(request.uri.query).map { |k, v| [ k, v.first ] }.to_h
     else
       {}
     end
 
     # form
     if request.headers['Content-Type'] == 'application/x-www-form-urlencoded'
-      response[:form] = CGI.parse(request.body).map { |k, v| [k, v.first] }.to_h
+      response[:form] = CGI.parse(request.body).map { |k, v| [ k, v.first ] }.to_h
     end
 
     # json

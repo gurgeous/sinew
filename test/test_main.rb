@@ -1,6 +1,16 @@
 require_relative 'test_helper'
 
 class TestMain < MiniTest::Test
+  def test_basic
+    run_recipe <<~'EOF'
+      get "http://httpbin.org/html"
+      raw.scan(/<h1>([^<]+)/) do
+        csv_emit(h1: $1)
+      end
+    EOF
+    assert_equal("h1\nHerman Melville - Moby-Dick\n", IO.read(CSV))
+  end
+
   def test_noko
     run_recipe <<~'EOF'
       get 'http://httpbin.org/html'
@@ -8,17 +18,17 @@ class TestMain < MiniTest::Test
         csv_emit(h1: h1.text)
       end
     EOF
-    assert_equal("h1\nHerman Melville - Moby-Dick\n", File.read(CSV))
+    assert_equal("h1\nHerman Melville - Moby-Dick\n", IO.read(CSV))
   end
 
-  def test_raw
+  def test_xml
     run_recipe <<~'EOF'
-      get "http://httpbin.org/html"
-      raw.scan(/<h1>([^<]+)/) do
-        csv_emit(h1: $1)
+      get 'http://httpbin.org/xml'
+      noko.css("slide title").each do |title|
+        csv_emit(title: title.text)
       end
     EOF
-    assert_equal("h1\nHerman Melville - Moby-Dick\n", File.read(CSV))
+    assert_equal("title\nWake up to WonderWidgets!\nOverview\n", IO.read(CSV))
   end
 
   def test_rate_limit
@@ -49,6 +59,6 @@ class TestMain < MiniTest::Test
     run_recipe <<~'EOF'
       (1..10).each { |i| csv_emit(i: i) }
     EOF
-    assert_equal "i\n1\n2\n3\n", File.read(CSV)
+    assert_equal "i\n1\n2\n3\n", IO.read(CSV)
   end
 end

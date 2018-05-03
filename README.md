@@ -34,7 +34,7 @@ I am pleased to announce the release of Sinew 2.0, a complete rewrite of Sinew f
 
 * Remove dependencies on active_support, curl and tidy. We use HTTParty now.
 * Much easier to customize requests in `.sinew` files. For example, setting User-Agent or Bearer tokens.
-* More operations like `post_json` or the generic `http`. These methods are thing wrappers around HTTParty.
+* More operations like `post_json` or the generic `http`. These methods are thin wrappers around HTTParty.
 * New end-of-run report.
 * Tests, rubocop, vscode settings, travis, etc.
 
@@ -132,7 +132,8 @@ Because all requests are cached, you can run Sinew repeatedly with confidence. R
 
 * `raw` - the raw response from the last request
 * `html` - like `raw`, but with a handful of HTML-specific whitespace cleanups
-* `noko` - a [Nokogiri](http://nokogiri.org) document built from the tidied HTML
+* `noko` - parse the response as HTML and return a [Nokogiri](http://nokogiri.org) document
+* `xml` - parse the response as XML and return a [Nokogiri](http://nokogiri.org) document
 * `json` - parse the response as JSON, with symbolized keys
 * `url` - the url of the last request. If the request goes through a redirect, `url` will reflect the final url.
 * `uri` - the URI of the last request. This is useful for resolving relative URLs.
@@ -168,6 +169,10 @@ noko.css("table")[4].css("td").select { |i| i[:width].to_i > 80 }.map(&:text)
 * Almost no support for international (non-english) characters
 
 ## Changelog
+
+#### (unreleased)
+
+* Added support for `--limit` and `xml`
 
 #### 2.0.1 (May 2018)
 

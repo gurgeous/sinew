@@ -53,14 +53,13 @@ module Sinew
 
     def http(method, url, options = {})
       # reset
-      @html = @noko = @json = @url = nil
+      instance_variables.each do |i|
+        instance_variable_set(i, nil) if i != :@sinew
+      end
 
-      # fetch
+      # fetch and make response available to callers
       response = sinew.http(method, url, options)
-
-      # respond
-      @uri = response.uri
-      @raw = response.body
+      @uri, @raw = response.uri, response.body
     end
 
     #
@@ -80,6 +79,10 @@ module Sinew
 
     def noko
       @noko ||= Nokogiri::HTML(html)
+    end
+
+    def xml
+      @xml ||= Nokogiri::XML(html)
     end
 
     def json
