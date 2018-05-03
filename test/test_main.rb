@@ -43,4 +43,12 @@ class TestMain < MiniTest::Test
     Kernel.send(:alias_method, :sleep, :old_sleep)
     Kernel.send(:undef_method, :old_sleep)
   end
+
+  def test_output_limit
+    sinew.options[:limit] = 3
+    run_recipe <<~'EOF'
+      (1..10).each { |i| csv_emit(i: i) }
+    EOF
+    assert_equal "i\n1\n2\n3\n", File.read(CSV)
+  end
 end

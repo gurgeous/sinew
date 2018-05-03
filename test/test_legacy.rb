@@ -12,8 +12,10 @@ class TestLegacy < MiniTest::Test
   end
 
   def test_legacy
-    sinew.dsl.get('http://eu.httpbin.org/status/500')
-    assert_equal "\n", sinew.dsl.raw
+    assert_output(/failed with 999/) do
+      sinew.dsl.get('http://eu.httpbin.org/status/500')
+      assert_equal "\n", sinew.dsl.raw
+    end
 
     sinew.dsl.get('http://eu.httpbin.org/redirect/3')
     assert_equal 'http://eu.httpbin.org/get', sinew.dsl.url

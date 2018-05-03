@@ -12,8 +12,9 @@ require 'slop'
 options = Slop.parse do |o|
   o.banner = 'Usage: sinew [options] <gub.sinew>'
   o.bool '-v', '--verbose', 'dump every row'
-  o.bool '--version', 'show version'
   o.bool '-q', '--quiet', 'suppress some output'
+  o.bool '--version', 'show version'
+  o.integer '--limit', 'quit after this many rows'
   o.string '--cache', 'Set the cache directory (defaults to ~/.sinew)', default: "#{ENV['HOME']}/.sinew"
   o.on '--help' do
     puts o

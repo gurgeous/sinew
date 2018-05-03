@@ -7,6 +7,9 @@ require 'cgi'
 
 module Sinew
   class DSL
+    # this is used to break out of --limit
+    class LimitError < StandardError; end
+
     attr_reader :sinew, :raw, :uri, :elapsed
 
     def initialize(sinew)
@@ -15,8 +18,12 @@ module Sinew
 
     def run
       tm = Time.now
-      recipe = sinew.options[:recipe]
-      instance_eval(File.read(recipe, mode: 'rb'), recipe)
+      begin
+        recipe = sinew.options[:recipe]
+        instance_eval(File.read(recipe, mode: 'rb'), recipe)
+      rescue LimitError
+        # ignore - this is flow control for --limit
+      end
       @elapsed = Time.now - tm
     end
 
@@ -93,6 +100,9 @@ module Sinew
 
     def csv_emit(row)
       sinew.output.emit(row)
+      if sinew.output.count == sinew.options[:limit]
+        raise LimitError.new
+      end
     end
   end
 end
