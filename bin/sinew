@@ -15,6 +15,7 @@ options = Slop.parse do |o|
   o.bool '-q', '--quiet', 'suppress some output'
   o.integer '-l', '--limit', 'quit after emitting this many rows'
   o.string '-c', '--cache', 'set custom cache directory', default: "#{ENV['HOME']}/.sinew"
+  o.string '--proxy', 'use host[:port] as HTTP proxy'
   o.bool '--version', 'show version and exit'
   o.on('--help', 'show this help') do
     puts o

@@ -7,6 +7,7 @@ module Sinew
     attr_accessor :retries
     attr_accessor :rate_limit
     attr_accessor :headers
+    attr_accessor :httparty_options
     attr_accessor :before_generate_cache_key
 
     def initialize
@@ -15,6 +16,7 @@ module Sinew
       self.headers = {
         'User-Agent' => "sinew/#{VERSION}",
       }
+      self.httparty_options = {}
       self.before_generate_cache_key = ->(i) { i }
 
       # for testing

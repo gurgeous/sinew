@@ -28,7 +28,10 @@ module Sinew
     def perform
       validate!
 
-      # merge global/options headers
+      # merge optons
+      options = self.options.merge(sinew.runtime_options.httparty_options)
+
+      # merge headers
       headers = sinew.runtime_options.headers
       headers = headers.merge(options[:headers]) if options[:headers]
       options[:headers] = headers

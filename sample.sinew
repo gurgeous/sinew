@@ -1,1 +1,9 @@
-get 'https://postmates.com/sitemap/sitemap_all_merchants_latest.xml.gz'
+get 'http://httpbin.org'
+noko.css('ul li a').each do |a|
+  row = {}
+  row[:url] = a[:href]
+  row[:title] = a.text
+  csv_emit(row)
+end
+
+get 'http://httpbin.org/redirect/2'
