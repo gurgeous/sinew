@@ -6,8 +6,8 @@ Sinew collects structured data from web sites (screen scraping). It provides a R
 
 Sinew is distributed as a ruby gem:
 
-```ruby
-gem install sinew
+```sh
+$ gem install sinew
 ```
 
 or in your Gemfile:
@@ -18,17 +18,16 @@ gem 'sinew'
 
 ## Table of Contents
 
-<!---
-markdown-toc --no-firsth1 --maxdepth 1 readme.md
--->
+<!--- markdown-toc --no-firsth1 --maxdepth 1 readme.md -->
 
-* [Sinew 2 (May 2018)](#sinew-2-may-2018)
+* [Sinew 2](#sinew-2-may-2018)
 * [Quick Example](#quick-example)
 * [How it Works](#how-it-works)
 * [DSL Reference](#dsl-reference)
 * [Hints](#hints)
 * [Limitations](#limitations)
 * [Changelog](#changelog)
+* [License](#license)
 
 ## Sinew 2 (May 2018)
 
@@ -126,11 +125,13 @@ Because all requests are cached, you can run Sinew repeatedly with confidence. R
 #### Making requests
 
 * `get(url, query = {})` - fetch a url with HTTP GET. URL parameters can be added using `query.
-* `post(url, form = {})` - fetch a url with HTTP POST, using `form` as the POST body.
+* `post(url, form = {})` - fetch a url with HTTP POST, using `form` as the URL encoded POST body.
 * `post_json(url, json = {})` - fetch a url with HTTP POST, using `json` as the POST body.
 * `http(method, url, options = {})` - use this for more complex requests
 
 #### Parsing the response
+
+These variables are set after each HTTP request.
 
 * `raw` - the raw response from the last request
 * `html` - like `raw`, but with a handful of HTML-specific whitespace cleanups
@@ -184,15 +185,10 @@ noko.css("table")[4].css("td").select { |i| i[:width].to_i > 80 }.map(&:text)
 
 * Complete rewrite. See above.
 
-#### 1.0.3
+#### 1.0.3 (June 2012)
 
-* Friendlier message if curl or tidy are missing.
+...
 
-#### 1.0.2
+## License
 
-* Remove entity options from tidy, which didn't work on MacOS (thanks Rex!)
-
-#### 1.0.1
-
-* Trying to run on 1.8 produces a fatal error. Onward!
-* Added first batch of unit tests
+This extension is [licensed under the MIT License](LICENSE).
