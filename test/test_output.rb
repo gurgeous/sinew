@@ -47,7 +47,7 @@ class TestOutput < MiniTest::Test
     # convert_accented_html_entities
     assert_equal('a', output.send(:normalize, '&aacute;'))
     # convert_miscellaneous_html_entities
-    assert_equal('<>', output.send(:normalize, '&lt;&gt;'))
+    assert_equal('<&>', output.send(:normalize, '&lt;&amp;&gt;'))
     # to_ascii
     assert_equal('cafe', output.send(:normalize, "caf\xc3\xa9"))
     # squish

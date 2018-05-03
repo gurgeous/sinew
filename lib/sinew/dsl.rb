@@ -10,6 +10,9 @@ module Sinew
     # this is used to break out of --limit
     class LimitError < StandardError; end
 
+    # these are the variables available after each request
+    RESPONSE_VARS = %i[@raw @uri @url @html @noko @xml @json].freeze
+
     attr_reader :sinew, :raw, :uri, :elapsed
 
     def initialize(sinew)
@@ -52,10 +55,8 @@ module Sinew
     end
 
     def http(method, url, options = {})
-      # reset
-      instance_variables.each do |i|
-        instance_variable_set(i, nil) if i != :@sinew
-      end
+      # reset response variables
+      RESPONSE_VARS.each { |i| instance_variable_set(i, nil) }
 
       # fetch and make response available to callers
       response = sinew.http(method, url, options)

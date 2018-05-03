@@ -3,6 +3,13 @@ require 'set'
 require 'stringex'
 
 #
+# Stringex customizations
+#
+
+# turn '&amp;' into '&', not 'and'
+Stringex::Localization::DefaultConversions::HTML_ENTITIES[:amp] = '&'
+
+#
 # CSV output.
 #
 
