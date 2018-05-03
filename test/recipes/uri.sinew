@@ -1,0 +1,11 @@
+# This tests get by URI, URI math, and csv_emit with uri
+get(URI.parse('http://httpbin.org/html'))
+csv_emit(url: uri)
+
+get(uri + '../get')
+csv_emit(url: uri)
+
+# OUTPUT
+# url
+# http://httpbin.org/html
+# http://httpbin.org/get
