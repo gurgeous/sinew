@@ -1,0 +1,9 @@
+get 'http://httpbin.org/xml'
+noko.css('slide title').each do |title|
+  csv_emit(title: title.text)
+end
+
+# OUTPUT
+# title
+# Wake up to WonderWidgets!
+# Overview

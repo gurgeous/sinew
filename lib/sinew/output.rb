@@ -7,11 +7,12 @@ require 'stringex'
 
 module Sinew
   class Output
-    attr_reader :sinew, :columns, :rows, :csv
+    attr_reader :sinew, :columns, :rows, :urls, :csv
 
     def initialize(sinew)
       @sinew = sinew
       @rows = []
+      @urls = Set.new
     end
 
     def filename
@@ -41,6 +42,8 @@ module Sinew
       # implicit header if necessary
       header(row.keys) if !csv
 
+      # don't allow duplicate urls
+      return if dup_url?(row)
       rows << row.dup
 
       # map columns to row, and normalize along the way
@@ -122,5 +125,17 @@ module Sinew
       s
     end
     protected :normalize
+
+    def dup_url?(row)
+      if url = row[:url]
+        if urls.include?(url)
+          sinew.warning("duplicate url: #{url}") if !sinew.quiet?
+          return true
+        end
+        urls << url
+      end
+      false
+    end
+    protected :dup_url?
   end
 end

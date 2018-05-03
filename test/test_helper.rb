@@ -12,8 +12,6 @@ require 'sinew'
 
 class MiniTest::Test
   TMP = '/tmp/_test_sinew'.freeze
-  RECIPE = "#{TMP}/test.sinew".freeze
-  CSV = "#{TMP}/test.csv".freeze
   HTML = File.read("#{__dir__}/test.html")
 
   def setup
@@ -27,15 +25,9 @@ class MiniTest::Test
   end
 
   def sinew
-    @sinew ||= Sinew::Main.new(cache: TMP, quiet: true, recipe: RECIPE)
+    @sinew ||= Sinew::Main.new(cache: TMP, quiet: true, recipe: "#{TMP}/ignore.sinew")
   end
   protected :sinew
-
-  def run_recipe(recipe)
-    File.write(RECIPE, recipe)
-    sinew.run
-  end
-  protected :run_recipe
 
   def test_network?
     !!ENV['SINEW_TEST_NETWORK']

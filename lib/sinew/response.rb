@@ -60,17 +60,17 @@ module Sinew
     end
 
     def self.from_legacy_head(response, head)
-      response.tap do |response|
+      response.tap do |r|
         case head
         when /\ACURLER_ERROR/
           # error
-          response.code = 999
+          r.code = 999
         when /\AHTTP/
           # redirect
           location = head.scan(/Location: ([^\r\n]+)/).flatten.last
-          response.uri += location
+          r.uri += location
         else
-          $stderr.puts "unknown cached /head for #{response.uri}"
+          $stderr.puts "unknown cached /head for #{r.uri}"
         end
       end
     end

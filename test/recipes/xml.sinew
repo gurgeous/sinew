@@ -1,0 +1,8 @@
+get 'http://httpbin.org/html'
+noko.css('h1').each do |h1|
+  csv_emit(h1: h1.text)
+end
+
+# OUTPUT
+# h1
+# Herman Melville - Moby-Dick

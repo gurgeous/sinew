@@ -1,25 +1,6 @@
 require_relative 'test_helper'
 
 class TestOutput < MiniTest::Test
-  def test_output
-    sinew.dsl.csv_header(:n, :a, :p)
-    sinew.dsl.csv_emit(n: 'n1', a: 'a1')
-    sinew.dsl.csv_emit(n: 'n2', a: 'a2')
-    assert_equal 2, sinew.output.count
-    assert_equal "n,a,p\nn1,a1,\"\"\nn2,a2,\"\"\n", IO.read(CSV)
-  end
-
-  def test_implicit_header
-    sinew.dsl.csv_emit(name: 'bob', address: 'main')
-    assert_equal "name,address\nbob,main\n", IO.read(CSV)
-  end
-
-  def test_array_header
-    sinew.dsl.csv_header(%i[n a p])
-    sinew.dsl.csv_emit(n: 'n1', a: 'a1')
-    assert_equal "n,a,p\nn1,a1,\"\"\n", IO.read(CSV)
-  end
-
   def test_filenames
     sinew = Sinew::Main.new(recipe: 'gub.sinew')
     assert_equal 'gub.csv', sinew.output.filename
