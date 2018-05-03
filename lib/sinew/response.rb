@@ -1,3 +1,6 @@
+require 'stringio'
+require 'zlib'
+
 #
 # An HTTP response. Mostly a wrapper around HTTParty.
 #
@@ -16,13 +19,7 @@ module Sinew
         response.uri = party_response.request.last_uri
         response.code = party_response.code
         response.headers = party_response.headers.to_h
-
-        # force to utf-8 as best we can
-        body = party_response.body
-        if body.encoding != Encoding::UTF_8
-          body = body.encode('UTF-8', invalid: :replace, undef: :replace, replace: '?')
-        end
-        response.body = body
+        response.body = process_body(party_response)
       end
     end
 
@@ -73,6 +70,28 @@ module Sinew
           $stderr.puts "unknown cached /head for #{r.uri}"
         end
       end
+    end
+
+    # helper for decoding bodies before parsing
+    def self.process_body(response)
+      body = response.body
+
+      # inflate if necessary
+      bits = body[0, 10].force_encoding('BINARY')
+      if bits =~ /\A\x1f\x8b/n
+        body = Zlib::GzipReader.new(StringIO.new(body)).read
+      end
+
+      # force to utf-8 if we think this could be text
+      if body.encoding != Encoding::UTF_8
+        if content_type = response.headers['content-type']
+          if content_type =~ /\b(html|javascript|json|text|xml)\b/
+            body = body.encode('UTF-8', invalid: :replace, undef: :replace, replace: '?')
+          end
+        end
+      end
+
+      body
     end
 
     #
