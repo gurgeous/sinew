@@ -97,15 +97,15 @@ module Sinew
         s.to_s
       end
 
+      # strip html tags. Note that we replace tags with spaces
+      s = s.gsub(/<[^>]+>/, ' ')
+
       #
       # Below uses stringex
       #
       # github.com/rsl/stringex/blob/master/lib/stringex/string_extensions.rb
       # github.com/rsl/stringex/blob/master/lib/stringex/localization/conversion_expressions.rb
       #
-
-      # <a>b</a> => b
-      s = s.strip_html_tags
 
       # Converts MS Word 'smart punctuation' to ASCII
       s = s.convert_smart_punctuation

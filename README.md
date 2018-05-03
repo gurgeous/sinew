@@ -176,6 +176,7 @@ noko.css("table")[4].css("td").select { |i| i[:width].to_i > 80 }.map(&:text)
 #### (unreleased)
 
 * Added support for `--limit` and `xml`
+* Dedup - warn and ignore if row[:url] has already been emitted
 
 #### 2.0.1 (May 2018)
 

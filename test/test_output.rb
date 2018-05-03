@@ -40,6 +40,8 @@ class TestOutput < MiniTest::Test
 
     # strip_html_tags
     assert_equal('gub', output.send(:normalize, '<tag>gub</tag>'))
+    # strip_html_tags and replace with spaces
+    assert_equal('hello world', output.send(:normalize, '<tag>hello<br>world</tag>'))
     # convert_smart_punctuation
     assert_equal('"gub"', output.send(:normalize, "\302\223gub\302\224"))
     # convert_accented_html_entities
