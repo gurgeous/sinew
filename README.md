@@ -173,6 +173,10 @@ noko.css("table")[4].css("td").select { |i| i[:width].to_i > 80 }.map(&:text)
 
 ## Changelog
 
+#### 2.0.3 (unreleased)
+
+* &amp; now normalizes to & (not and)
+
 #### 2.0.2 (May 2018)
 
 * Support for `--limit`, `--proxy` and the `xml` variable
