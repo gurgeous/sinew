@@ -169,6 +169,10 @@ noko.css("table")[4].css("td").select { |i| i[:width].to_i > 80 }.map(&:text)
 
 ## Changelog
 
+#### 2.0.1 (May 2018)
+
+* Support for legacy cached `head` files from Sinew 1
+
 #### 2.0.0 (May 2018)
 
 * Complete rewrite. See above.
