@@ -1,3 +1,5 @@
+![Travis](https://travis-ci.org/gurgeous/sinew.svg?branch=master)
+
 ## Welcome to Sinew
 
 Sinew collects structured data from web sites (screen scraping). It provides a Ruby DSL built for crawling, a robust caching system, and integration with [Nokogiri](http://nokogiri.org). Though small, this project is the culmination of years of effort based on crawling systems built at several different companies.
