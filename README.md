@@ -173,7 +173,7 @@ noko.css("table")[4].css("td").select { |i| i[:width].to_i > 80 }.map(&:text)
 
 ## Changelog
 
-#### 2.0.3 (unreleased)
+#### 2.0.3 (May 2018)
 
 * &amp; now normalizes to & (not and)
 
