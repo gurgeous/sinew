@@ -121,9 +121,15 @@ class TestRequests < MiniTest::Test
   end
 
   def test_before_generate_cache_key
+    # arity 1
     sinew.runtime_options.before_generate_cache_key = method(:redact_cache_key)
     req = Sinew::Request.new(sinew, 'get', 'http://host', query: { secret: 'xyz' })
     assert_equal 'host/secret=redacted', req.cache_key
+
+    # arity 2
+    sinew.runtime_options.before_generate_cache_key = method(:add_scheme)
+    req = Sinew::Request.new(sinew, 'get', 'https://host/gub')
+    assert_equal 'host/https,gub', req.cache_key
   end
 
   def test_urls
@@ -149,4 +155,10 @@ class TestRequests < MiniTest::Test
     key
   end
   protected :redact_cache_key
+
+  def add_scheme(key, uri)
+    key[:scheme] = uri.scheme
+    key
+  end
+  protected :add_scheme
 end

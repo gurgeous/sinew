@@ -73,16 +73,26 @@ module Sinew
         body&.dup
       end
 
-      # build key, as a hash for before_generate_cache_key
+      # Build key, as a hash for before_generate_cache_key. Note that :scheme is
+      # just a placeholder in case someone wants to add it for real, so that
+      # it'll appear in the correct order. We remove the placerholder after we
+      # call the proc.
       key = {
         method: method.dup,
+        scheme: 'placeholder',
         path: uri.path,
         query: uri.query,
         body: body_key,
       }
-      key = sinew.runtime_options.before_generate_cache_key.call(key)
 
-      # strip method for gets
+      args = [ key ]
+      if sinew.runtime_options.before_generate_cache_key.arity == 2
+        args << uri
+      end
+      key = sinew.runtime_options.before_generate_cache_key.call(*args)
+
+      # strip defaults
+      key.delete(:scheme) if key[:scheme] == 'placeholder'
       key.delete(:method) if key[:method] == 'get'
 
       # pull out the values, join and pathify
