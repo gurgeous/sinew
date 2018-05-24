@@ -8,6 +8,7 @@ class TestRequests < MiniTest::Test
 
   def test_basic_methods
     sinew.dsl.get('http://httpbin.org/get', a: 1, b: 2)
+    assert_equal(200, sinew.dsl.code)
     assert_equal({ a: '1', b: '2' }, sinew.dsl.json[:args])
 
     sinew.dsl.post('http://httpbin.org/post', a: 1, b: 2)
@@ -38,13 +39,29 @@ class TestRequests < MiniTest::Test
     # 500
     assert_output(/failed with 500/) do
       sinew.dsl.get('http://httpbin.org/status/500')
+      assert_equal 500, sinew.dsl.code
       assert_equal '500', sinew.dsl.raw
     end
 
     # timeout
     assert_output(/failed with 999/) do
       sinew.dsl.get('http://httpbin.org/delay/1')
-      assert_equal 'timeout', sinew.dsl.raw
+      assert_equal 999, sinew.dsl.code
+    end
+
+    # uncommon errors
+    errors = [
+      Errno::ECONNREFUSED,
+      HTTParty::RedirectionTooDeep.new(nil),
+      OpenSSL::SSL::SSLError.new,
+      SocketError.new,
+    ]
+    errors.each_with_index do |error, index|
+      stub_request(:get, %r{http://[^/]+/error#{index}}).to_return { raise error }
+      assert_output(/failed with 999/) do
+        sinew.dsl.get("http://httpbin.org/error#{index}")
+        assert_equal 999, sinew.dsl.code
+      end
     end
   end
 

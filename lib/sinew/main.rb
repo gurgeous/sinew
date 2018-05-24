@@ -75,8 +75,8 @@ module Sinew
         begin
           @request_count += 1
           response = request.perform
-        rescue Timeout::Error
-          response = Response.from_timeout(request)
+        rescue HTTParty::RedirectionTooDeep, OpenSSL::SSL::SSLError, SocketError, SystemCallError, Timeout::Error => e
+          response = Response.from_error(request, e)
         end
         break if !response.error_500?
       end

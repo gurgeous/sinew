@@ -46,11 +46,11 @@ module Sinew
       end
     end
 
-    def self.from_timeout(request)
+    def self.from_error(request, error)
       Response.new.tap do |response|
         response.request = request
         response.uri = request.uri
-        response.body = 'timeout'
+        response.body = error.to_s
         response.code = 999
         response.headers = {}
       end

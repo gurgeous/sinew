@@ -10,7 +10,7 @@ module Sinew
     # this is used to break out of --limit
     class LimitError < StandardError; end
 
-    attr_reader :sinew, :raw, :uri, :elapsed
+    attr_reader :sinew, :uri, :raw, :code, :elapsed
 
     def initialize(sinew)
       @sinew = sinew
@@ -59,7 +59,7 @@ module Sinew
 
       # fetch and make response available to callers
       response = sinew.http(method, url, options)
-      @uri, @raw = response.uri, response.body
+      @uri, @raw, @code = response.uri, response.body, response.code
 
       # don't confuse the user
       nil

@@ -2,6 +2,9 @@ require 'minitest/autorun'
 require 'minitest/pride'
 require 'webmock/minitest' unless ENV['SINEW_TEST_NETWORK']
 
+# to run one test, do this:
+# TEST=test/unit/query_test.rb TESTOPTS="--name=test_parse" rake
+
 # a hint to sinew, so that it'll do things like set rate limit to zero
 ENV['SINEW_TEST'] = '1'
 
