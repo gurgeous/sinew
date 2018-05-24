@@ -177,6 +177,7 @@ noko.css("table")[4].css("td").select { |i| i[:width].to_i > 80 }.map(&:text)
 
 * Handle and cache more errors (too many redirects, connection failures, etc.)
 * Support for adding uri.scheme in generate_cache_key
+* Added status `code`, a peer to `uri`, `raw`, etc.
 
 #### 2.0.3 (May 2018)
 
