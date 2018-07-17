@@ -15,12 +15,6 @@ module Sinew
       @runtime_options = RuntimeOptions.new
       @request_tm = Time.at(0)
       @request_count = 0
-
-      if options[:proxy]
-        addr, port = options[:proxy].split(':')
-        runtime_options.httparty_options[:http_proxyaddr] = addr
-        runtime_options.httparty_options[:http_proxyport] = port || 80
-      end
     end
 
     def run
@@ -105,6 +99,7 @@ module Sinew
         else
           "req #{request.uri}"
         end
+        msg = "#{msg} => #{request.proxy}" if request.proxy
         $stderr.puts msg
       end
 

@@ -24,19 +24,36 @@ module Sinew
       @cache_key = calculate_cache_key
     end
 
+    def proxy
+      @proxy ||= begin
+        if proxies = sinew.options[:proxy]
+          proxies.split(',').sample
+        end
+      end
+    end
+
     # run the request, return the result
     def perform
       validate!
 
-      # merge optons
-      options = self.options.merge(sinew.runtime_options.httparty_options)
+      party_options = options.dup
+
+      # merge proxy
+      if proxy = self.proxy
+        addr, port = proxy.split(':')
+        party_options[:http_proxyaddr] = addr
+        party_options[:http_proxyport] = port || 80
+      end
+
+      # now merge runtime_options
+      party_options = party_options.merge(sinew.runtime_options.httparty_options)
 
       # merge headers
       headers = sinew.runtime_options.headers
-      headers = headers.merge(options[:headers]) if options[:headers]
-      options[:headers] = headers
+      headers = headers.merge(party_options[:headers]) if party_options[:headers]
+      party_options[:headers] = headers
 
-      party_response = HTTParty.send(method, uri, options)
+      party_response = HTTParty.send(method, uri, party_options)
       Response.from_network(self, party_response)
     end
 
