@@ -38,6 +38,7 @@ module Sinew
           if head !~ /^{/
             return from_legacy_head(response, head)
           end
+
           head = JSON.parse(head, symbolize_names: true)
           response.uri = URI.parse(head[:uri])
           response.code = head[:code]

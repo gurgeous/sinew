@@ -30,7 +30,7 @@ class String
     elsif limit >= size
       dup
     else
-      self[-limit..-1]
+      self[-limit..]
     end
   end
 

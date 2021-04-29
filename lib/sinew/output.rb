@@ -52,6 +52,7 @@ module Sinew
 
       # don't allow duplicate urls
       return if dup_url?(row)
+
       rows << row.dup
 
       # map columns to row, and normalize along the way

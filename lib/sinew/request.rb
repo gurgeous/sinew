@@ -164,7 +164,7 @@ module Sinew
       s = s.gsub(',,', ',')
       # encode invalid path chars
       s = s.gsub(/[^A-Za-z0-9_.,=-]/) do |i|
-        hex = i.unpack('H2').first
+        hex = i.unpack1('H2')
         "%#{hex}"
       end
       # handle empty case
