@@ -52,7 +52,6 @@ class TestRequests < MiniTest::Test
     # uncommon errors
     errors = [
       Errno::ECONNREFUSED,
-      HTTParty::RedirectionTooDeep.new(nil),
       OpenSSL::SSL::SSLError.new,
       SocketError.new,
     ]

@@ -2,7 +2,7 @@ require 'stringio'
 require 'zlib'
 
 #
-# An HTTP response. Mostly a wrapper around HTTParty.
+# An HTTP response.
 #
 
 module Sinew

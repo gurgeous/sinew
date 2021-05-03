@@ -11,7 +11,7 @@ module Sinew
       Faraday.new(nil) do
         _1.use RateLimit, rate_limit: runtime_options.rate_limit
 
-        # BEFORE httpdisk so each redirect segment is cached
+        # Before httpdisk so each redirect segment is cached
         # Keep track of redirect status for logger
         _1.response :follow_redirects, callback: ->(_old_env, new_env) { new_env[:redirect] = true }
 
@@ -21,7 +21,7 @@ module Sinew
         # disk caching
         _1.use :httpdisk, dir: options[:cache]
 
-        # AFTER httpdisk so transient failures are not cached
+        # After httpdisk so transient failures are not cached
         retry_options = {
           interval: runtime_options.rate_limit,
           max: runtime_options.retries,
@@ -31,7 +31,7 @@ module Sinew
         }
         _1.request :retry, retry_options
 
-        # AFTER httpdisk so that only non-cached requests are logged
+        # After httpdisk so that only non-cached requests are logged
         _1.response :logger, nil, formatter: LogFormatter if !options[:quiet]
       end
     end

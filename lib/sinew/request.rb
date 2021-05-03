@@ -1,9 +1,8 @@
 require 'digest/md5'
-require 'httparty'
 require 'htmlentities'
 
 #
-# Process a single HTTP request. Mostly a wrapper around HTTParty.
+# Process a single HTTP request.
 #
 
 module Sinew
@@ -38,10 +37,12 @@ module Sinew
       headers = sinew.runtime_options.headers
       headers = headers.merge(options[:headers]) if options[:headers]
 
+      query = options.delete(:query)
+
       # TODO: handle all options
       # party_options = options.dup.merge(sinew.runtime_options.httparty_options)
 
-      fday_response = connection.send(method, uri, nil, headers) do
+      fday_response = connection.send(method, uri, query, headers) do
         _1.options[:proxy] = proxy
       end
 
@@ -58,15 +59,6 @@ module Sinew
       # fix a couple of common encoding bugs
       s = s.gsub(' ', '%20')
       s = s.gsub("'", '%27')
-
-      # append query manually (instead of letting HTTParty handle it) so we can
-      # include it in cache_key
-      query = options.delete(:query)
-      if query.present?
-        q = HTTParty::HashConversions.to_params(query)
-        separator = s.include?('?') ? '&' : '?'
-        s = "#{s}#{separator}#{q}"
-      end
 
       URI.parse(s)
     end

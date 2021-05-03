@@ -1,5 +1,6 @@
 require 'awesome_print'
 require 'cgi'
+require 'json'
 
 #
 # The DSL available to .sinew files.

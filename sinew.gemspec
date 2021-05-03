@@ -20,7 +20,6 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency 'faraday', '~> 1.4'
   s.add_runtime_dependency 'faraday-encoding', '~> 0'
   s.add_runtime_dependency 'htmlentities', '~> 4.3'
-  s.add_runtime_dependency 'httparty', '~> 0.16'
   s.add_runtime_dependency 'httpdisk', '~> 0'
   s.add_runtime_dependency 'nokogiri', '~> 1.8'
   s.add_runtime_dependency 'scripto', '~> 0'
