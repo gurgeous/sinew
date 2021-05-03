@@ -13,7 +13,7 @@ module Sinew
     HTML_ENTITIES = HTMLEntities.new
     VALID_METHODS = %w[get post patch put delete head options].freeze
 
-    attr_reader :sinew, :method, :uri, :options, :cache_key
+    attr_reader :sinew, :method, :uri, :options
 
     # Options are largely compatible with HTTParty, except for :method.
     def initialize(sinew, method, url, options = {})
@@ -21,7 +21,6 @@ module Sinew
       @method = method
       @options = options.dup
       @uri = parse_url(url)
-      @cache_key = calculate_cache_key
     end
 
     def proxy
@@ -33,28 +32,20 @@ module Sinew
     end
 
     # run the request, return the result
-    def perform
+    def perform(connection)
       validate!
 
-      party_options = options.dup
+      headers = sinew.runtime_options.headers
+      headers = headers.merge(options[:headers]) if options[:headers]
 
-      # merge proxy
-      if proxy = self.proxy
-        addr, port = proxy.split(':')
-        party_options[:http_proxyaddr] = addr
-        party_options[:http_proxyport] = port || 80
+      # TODO: handle all options
+      # party_options = options.dup.merge(sinew.runtime_options.httparty_options)
+
+      fday_response = connection.send(method, uri, nil, headers) do
+        _1.options[:proxy] = proxy
       end
 
-      # now merge runtime_options
-      party_options = party_options.merge(sinew.runtime_options.httparty_options)
-
-      # merge headers
-      headers = sinew.runtime_options.headers
-      headers = headers.merge(party_options[:headers]) if party_options[:headers]
-      party_options[:headers] = headers
-
-      party_response = HTTParty.send(method, uri, party_options)
-      Response.from_network(self, party_response)
+      Response.from_network(self, fday_response)
     end
 
     # We accept sloppy urls and attempt to clean them up
@@ -80,50 +71,6 @@ module Sinew
       URI.parse(s)
     end
     protected :parse_url
-
-    def calculate_cache_key
-      dir = pathify(uri.host)
-
-      body_key = if body.is_a?(Hash)
-        HTTParty::HashConversions.to_params(body)
-      else
-        body&.dup
-      end
-
-      # Build key, as a hash for before_generate_cache_key. Note that :scheme is
-      # just a placeholder in case someone wants to add it for real, so that
-      # it'll appear in the correct order. We remove the placerholder after we
-      # call the proc.
-      key = {
-        method: method.dup,
-        scheme: 'placeholder',
-        path: uri.path,
-        query: uri.query,
-        body: body_key,
-      }
-
-      args = [ key ]
-      if sinew.runtime_options.before_generate_cache_key.arity == 2
-        args << uri
-      end
-      key = sinew.runtime_options.before_generate_cache_key.call(*args)
-
-      # strip defaults
-      key.delete(:scheme) if key[:scheme] == 'placeholder'
-      key.delete(:method) if key[:method] == 'get'
-
-      # pull out the values, join and pathify
-      path = key.values.select(&:present?).join(',')
-      path = pathify(path)
-
-      # shorten long paths
-      if path.length > 250
-        path = Digest::MD5.hexdigest(path)
-      end
-
-      "#{dir}/#{path}"
-    end
-    protected :calculate_cache_key
 
     def validate!
       raise "invalid method #{method}" if !VALID_METHODS.include?(method)

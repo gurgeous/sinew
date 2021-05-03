@@ -13,39 +13,39 @@ module Sinew
     # factory methods
     #
 
-    def self.from_network(request, party_response)
-      Response.new.tap do |response|
-        response.request = request
-        response.uri = party_response.request.last_uri
-        response.code = party_response.code
-        response.headers = party_response.headers.to_h
-        response.body = process_body(party_response)
+    def self.from_network(request, fday_response)
+      Response.new.tap do
+        _1.request = request
+        _1.uri = fday_response.env.url
+        _1.code = fday_response.status
+        _1.headers = fday_response.headers.to_h
+        _1.body = process_body(fday_response)
       end
     end
 
-    def self.from_cache(request, body, head)
-      Response.new.tap do |response|
-        response.request = request
-        response.body = body
+    # def self.from_cache(request, body, head)
+    #   Response.new.tap do |response|
+    #     response.request = request
+    #     response.body = body
 
-        # defaults
-        response.uri = request.uri
-        response.code = 200
-        response.headers = {}
+    #     # defaults
+    #     response.uri = request.uri
+    #     response.code = 200
+    #     response.headers = {}
 
-        # overwrite with cached response headers
-        if head
-          if head !~ /^{/
-            return from_legacy_head(response, head)
-          end
+    #     # overwrite with cached response headers
+    #     if head
+    #       if head !~ /^{/
+    #         return from_legacy_head(response, head)
+    #       end
 
-          head = JSON.parse(head, symbolize_names: true)
-          response.uri = URI.parse(head[:uri])
-          response.code = head[:code]
-          response.headers = head[:headers]
-        end
-      end
-    end
+    #       head = JSON.parse(head, symbolize_names: true)
+    #       response.uri = URI.parse(head[:uri])
+    #       response.code = head[:code]
+    #       response.headers = head[:headers]
+    #     end
+    #   end
+    # end
 
     def self.from_error(request, error)
       Response.new.tap do |response|
@@ -57,21 +57,21 @@ module Sinew
       end
     end
 
-    def self.from_legacy_head(response, head)
-      response.tap do |r|
-        case head
-        when /\ACURLER_ERROR/
-          # error
-          r.code = 999
-        when /\AHTTP/
-          # redirect
-          location = head.scan(/Location: ([^\r\n]+)/).flatten.last
-          r.uri += location
-        else
-          $stderr.puts "unknown cached /head for #{r.uri}"
-        end
-      end
-    end
+    # def self.from_legacy_head(response, head)
+    #   response.tap do |r|
+    #     case head
+    #     when /\ACURLER_ERROR/
+    #       # error
+    #       r.code = 999
+    #     when /\AHTTP/
+    #       # redirect
+    #       location = head.scan(/Location: ([^\r\n]+)/).flatten.last
+    #       r.uri += location
+    #     else
+    #       $stderr.puts "unknown cached /head for #{r.uri}"
+    #     end
+    #   end
+    # end
 
     # helper for decoding bodies before parsing
     def self.process_body(response)
