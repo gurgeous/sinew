@@ -7,15 +7,13 @@ require 'sinew/connection'
 
 module Sinew
   class Main < Scripto::Main
-    attr_reader :runtime_options, :request_tm, :request_count
+    attr_reader :runtime_options
 
     def initialize(options)
       super(options)
 
       # init
       @runtime_options = RuntimeOptions.new
-      @request_tm = Time.at(0)
-      @request_count = 0
     end
 
     def run
