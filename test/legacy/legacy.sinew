@@ -1,2 +1,0 @@
-get 'http://eu.httpbin.org/status/500'
-get 'http://eu.httpbin.org/redirect/3'

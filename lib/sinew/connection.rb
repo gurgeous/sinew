@@ -11,6 +11,9 @@ module Sinew
       Faraday.new(nil) do
         _1.use RateLimit, rate_limit: runtime_options.rate_limit
 
+        # auto-encode form bodies
+        _1.request :url_encoded
+
         # Before httpdisk so each redirect segment is cached
         # Keep track of redirect status for logger
         _1.response :follow_redirects, callback: ->(_old_env, new_env) { new_env[:redirect] = true }

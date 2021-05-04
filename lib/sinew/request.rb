@@ -38,11 +38,13 @@ module Sinew
       headers = headers.merge(options[:headers]) if options[:headers]
 
       query = options.delete(:query)
+      body = options.delete(:body)
+      raise "don't pass query and body" if query && body
 
       # TODO: handle all options
       # party_options = options.dup.merge(sinew.runtime_options.httparty_options)
 
-      fday_response = connection.send(method, uri, query, headers) do
+      fday_response = connection.send(method, uri, query || body, headers) do
         _1.options[:proxy] = proxy
       end
 
