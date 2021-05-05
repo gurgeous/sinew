@@ -23,7 +23,7 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency 'httpdisk', '~> 0'
   s.add_runtime_dependency 'nokogiri', '~> 1.8'
   s.add_runtime_dependency 'scripto', '~> 0'
-  s.add_runtime_dependency 'slop', '~> 4.6'
+  s.add_runtime_dependency 'slop', '~> 4.8'
   s.add_runtime_dependency 'stringex', '~> 2.8'
   s.add_development_dependency 'minitest', '~> 5.11'
   s.add_development_dependency 'rake', '~> 12.3'
