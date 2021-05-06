@@ -8,6 +8,7 @@ module Sinew
     attr_accessor :rate_limit
     attr_accessor :headers
     attr_accessor :httparty_options
+    attr_accessor :insecure
 
     def initialize
       self.retries = 3
@@ -16,6 +17,7 @@ module Sinew
         'User-Agent' => "sinew/#{VERSION}",
       }
       self.httparty_options = {}
+      self.insecure = false
 
       # for testing
       if ENV['SINEW_TEST']

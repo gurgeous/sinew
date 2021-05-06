@@ -8,7 +8,10 @@ require 'sinew/connection/rate_limit'
 module Sinew
   module Connection
     def self.create(options:, runtime_options:)
-      Faraday.new(nil) do
+      connection_options = {}
+      connection_options[:ssl] = { verify: false } if runtime_options.insecure
+
+      Faraday.new(nil, connection_options) do
         _1.use RateLimit, rate_limit: runtime_options.rate_limit
 
         # auto-encode form bodies
