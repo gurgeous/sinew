@@ -14,7 +14,10 @@ module Sinew
 
     attr_reader :sinew, :method, :uri, :options
 
-    # Options are largely compatible with HTTParty, except for :method.
+    # Supported options:
+    #  body: Body of http post
+    #  headers: Hash of HTTP headers (combined with runtime_options.headers)
+    #  query: Hash of query parameters to add to url
     def initialize(sinew, method, url, options = {})
       @sinew = sinew
       @method = method
@@ -38,9 +41,6 @@ module Sinew
       headers = headers.merge(options[:headers]) if options[:headers]
 
       body = options.delete(:body)
-
-      # TODO: handle all options
-      # party_options = options.dup.merge(sinew.runtime_options.httparty_options)
 
       fday_response = connection.send(method, uri, body, headers) do
         _1.options[:proxy] = proxy
