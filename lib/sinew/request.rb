@@ -37,14 +37,12 @@ module Sinew
       headers = sinew.runtime_options.headers
       headers = headers.merge(options[:headers]) if options[:headers]
 
-      query = options.delete(:query)
       body = options.delete(:body)
-      raise "don't pass query and body" if query && body
 
       # TODO: handle all options
       # party_options = options.dup.merge(sinew.runtime_options.httparty_options)
 
-      fday_response = connection.send(method, uri, query || body, headers) do
+      fday_response = connection.send(method, uri, body, headers) do
         _1.options[:proxy] = proxy
       end
 
@@ -61,6 +59,15 @@ module Sinew
       # fix a couple of common encoding bugs
       s = s.gsub(' ', '%20')
       s = s.gsub("'", '%27')
+
+      # append query manually (instead of letting Faraday handle it) for consistent
+      # Request#uri and Response#uri
+      query = options.delete(:query)
+      if query.present?
+        q = Faraday::Utils.default_params_encoder.encode(query)
+        separator = s.include?('?') ? '&' : '?'
+        s = "#{s}#{separator}#{q}"
+      end
 
       URI.parse(s)
     end
