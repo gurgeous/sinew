@@ -13,8 +13,12 @@ spec = Gem::Specification.load('sinew.gemspec')
 #
 
 # test (default)
-Rake::TestTask.new { _1.libs << 'test' }
 task default: :test
+
+Rake::TestTask.new do
+  _1.libs << 'test'
+  _1.warning = false # sterile has a few issues here
+end
 
 # Watch rb files, run tests whenever something changes
 task :watch do

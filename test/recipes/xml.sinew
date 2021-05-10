@@ -1,4 +1,4 @@
-get 'http://httpbin.org/html'
+get 'http://httpbingo.org/html'
 noko.css('h1').each do |h1|
   csv_emit(h1: h1.text)
 end

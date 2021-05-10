@@ -3,11 +3,11 @@ require_relative 'test_helper'
 class TestRequests < MiniTest::Test
   def test_get
     # network (or stub)
-    sinew.dsl.get('http://httpbin.org/get')
+    sinew.dsl.get('http://httpbingo.org/get')
     assert_equal 'UTF-8', sinew.dsl.raw.encoding.name
 
     # disk
-    sinew.dsl.get('http://httpbin.org/get')
+    sinew.dsl.get('http://httpbingo.org/get')
     assert_equal 'UTF-8', sinew.dsl.raw.encoding.name
   end
 
@@ -15,12 +15,12 @@ class TestRequests < MiniTest::Test
     skip if !test_network?
 
     # network
-    sinew.dsl.get('http://httpbin.org/encoding/utf8')
+    sinew.dsl.get('http://httpbingo.org/encoding/utf8')
     assert_equal 'UTF-8', sinew.dsl.raw.encoding.name
     assert_match(/∑/, sinew.dsl.raw)
 
     # disk
-    sinew.dsl.get('http://httpbin.org/encoding/utf8')
+    sinew.dsl.get('http://httpbingo.org/encoding/utf8')
     assert_equal 'UTF-8', sinew.dsl.raw.encoding.name
     assert_match(/∑/, sinew.dsl.raw)
   end

@@ -1,13 +1,6 @@
 require 'csv'
 require 'set'
-require 'stringex'
-
-#
-# Stringex customizations
-#
-
-# turn '&amp;' into '&', not 'and'
-Stringex::Localization::DefaultConversions::HTML_ENTITIES[:amp] = '&'
+require 'sterile'
 
 #
 # CSV output.
@@ -109,24 +102,14 @@ module Sinew
       # strip html tags. Note that we replace tags with spaces
       s = s.gsub(/<[^>]+>/, ' ')
 
-      #
-      # Below uses stringex
-      #
-      # github.com/rsl/stringex/blob/master/lib/stringex/string_extensions.rb
-      # github.com/rsl/stringex/blob/master/lib/stringex/localization/conversion_expressions.rb
-      #
-
       # Converts MS Word 'smart punctuation' to ASCII
-      s = s.convert_smart_punctuation
+      s = Sterile.plain_format(s)
 
-      # "&aacute;".convert_accented_html_entities # => "a"
-      s = s.convert_accented_html_entities
+      # &aacute; &amp; etc.
+      s = Sterile.decode_entities(s)
 
-      # &amp, &frac, etc.
-      s = s.convert_miscellaneous_html_entities
-
-      # convert unicode => regular characters
-      s = s.to_ascii
+      # "šţɽĩɳģ" => "string"
+      s = Sterile.transliterate(s)
 
       # squish
       s = s.squish

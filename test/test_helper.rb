@@ -1,5 +1,6 @@
 require 'minitest/autorun'
 require 'minitest/pride'
+require 'mocha/minitest'
 require 'webmock/minitest' unless ENV['SINEW_TEST_NETWORK']
 
 # to run one test, do this:
@@ -54,7 +55,7 @@ class MiniTest::Test
   #
 
   def respond_html(_request)
-    # this html was carefully chosen to somewhat match httpbin.org/html
+    # this html was carefully chosen to somewhat match httpbingo.org/html
     html = <<~EOF
       <body>
         <h1>Herman Melville - Moby-Dick</h1>
@@ -65,7 +66,7 @@ class MiniTest::Test
   protected :respond_html
 
   def respond_xml(_request)
-    # this xml was carefully chosen to somewhat match httpbin.org/xml
+    # this xml was carefully chosen to somewhat match httpbingo.org/xml
     xml = <<~EOF
       <!--   A SAMPLE set of slides   -->
       <slideshow>
@@ -87,14 +88,14 @@ class MiniTest::Test
 
     # args
     response[:args] = if request.uri.query
-      CGI.parse(request.uri.query).map { |k, v| [ k, v.first ] }.to_h
+      CGI.parse(request.uri.query)
     else
       {}
     end
 
     # form
     if request.headers['Content-Type'] == 'application/x-www-form-urlencoded'
-      response[:form] = CGI.parse(request.body).map { |k, v| [ k, v.first ] }.to_h
+      response[:form] = CGI.parse(request.body)
     end
 
     # json
