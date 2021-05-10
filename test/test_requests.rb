@@ -52,7 +52,6 @@ class TestRequests < MiniTest::Test
     # uncommon errors
     errors = [
       Errno::ECONNREFUSED,
-      HTTParty::RedirectionTooDeep.new(nil),
       OpenSSL::SSL::SSLError.new,
       SocketError.new,
     ]
@@ -97,41 +96,6 @@ class TestRequests < MiniTest::Test
     assert_equal 'done', sinew.dsl.raw
   end
 
-  def test_cache_key
-    # empty
-    req = Sinew::Request.new(sinew, 'get', 'http://host')
-    assert_equal req.cache_key, 'host/_root_'
-
-    # path
-    req = Sinew::Request.new(sinew, 'get', 'http://host/path')
-    assert_equal req.cache_key, 'host/path'
-
-    # query
-    req = Sinew::Request.new(sinew, 'get', 'http://host/path', query: { a: 'b' })
-    assert_equal req.cache_key, 'host/path,a=b'
-
-    # post with body
-    req = Sinew::Request.new(sinew, 'post', 'http://host/path', body: { c: 'd' })
-    assert_equal req.cache_key, 'host/post,path,c=d'
-
-    # too long should turn into digest
-    path = 'xyz' * 123
-    req = Sinew::Request.new(sinew, 'get', "http://host/#{path}")
-    assert_equal "host/#{Digest::MD5.hexdigest(path)}", req.cache_key
-  end
-
-  def test_before_generate_cache_key
-    # arity 1
-    sinew.runtime_options.before_generate_cache_key = method(:redact_cache_key)
-    req = Sinew::Request.new(sinew, 'get', 'http://host', query: { secret: 'xyz' })
-    assert_equal 'host/secret=redacted', req.cache_key
-
-    # arity 2
-    sinew.runtime_options.before_generate_cache_key = method(:add_scheme)
-    req = Sinew::Request.new(sinew, 'get', 'https://host/gub')
-    assert_equal 'host/https,gub', req.cache_key
-  end
-
   def test_urls
     # simple
     req = Sinew::Request.new(sinew, 'get', 'https://host')
@@ -149,16 +113,4 @@ class TestRequests < MiniTest::Test
     req = Sinew::Request.new(sinew, 'get', 'https://host?a=b c&d=f\'g')
     assert_equal 'https://host?a=b%20c&d=f%27g', req.uri.to_s
   end
-
-  def redact_cache_key(key)
-    key[:query].gsub!(/secret=[^&]+/, 'secret=redacted')
-    key
-  end
-  protected :redact_cache_key
-
-  def add_scheme(key, uri)
-    key[:scheme] = uri.scheme
-    key
-  end
-  protected :add_scheme
 end

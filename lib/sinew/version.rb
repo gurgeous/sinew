@@ -1,4 +1,4 @@
 module Sinew
   # Gem version
-  VERSION = '2.0.5'.freeze
+  VERSION = '3.0.0'.freeze
 end

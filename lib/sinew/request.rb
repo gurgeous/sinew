@@ -1,9 +1,8 @@
 require 'digest/md5'
-require 'httparty'
 require 'htmlentities'
 
 #
-# Process a single HTTP request. Mostly a wrapper around HTTParty.
+# Process a single HTTP request.
 #
 
 module Sinew
@@ -12,16 +11,19 @@ module Sinew
   class Request
     HTML_ENTITIES = HTMLEntities.new
     VALID_METHODS = %w[get post patch put delete head options].freeze
+    METHODS_WITH_BODY = %w[patch post put].freeze
 
-    attr_reader :sinew, :method, :uri, :options, :cache_key
+    attr_reader :sinew, :method, :uri, :options
 
-    # Options are largely compatible with HTTParty, except for :method.
+    # Supported options:
+    #  body: Body of http post
+    #  headers: Hash of HTTP headers (combined with runtime_options.headers)
+    #  query: Hash of query parameters to add to url
     def initialize(sinew, method, url, options = {})
       @sinew = sinew
       @method = method
       @options = options.dup
       @uri = parse_url(url)
-      @cache_key = calculate_cache_key
     end
 
     def proxy
@@ -33,28 +35,19 @@ module Sinew
     end
 
     # run the request, return the result
-    def perform
+    def perform(connection)
       validate!
 
-      party_options = options.dup
+      headers = sinew.runtime_options.headers
+      headers = headers.merge(options[:headers]) if options[:headers]
 
-      # merge proxy
-      if proxy = self.proxy
-        addr, port = proxy.split(':')
-        party_options[:http_proxyaddr] = addr
-        party_options[:http_proxyport] = port || 80
+      body = options.delete(:body)
+
+      fday_response = connection.send(method, uri, body, headers) do
+        _1.options[:proxy] = proxy
       end
 
-      # now merge runtime_options
-      party_options = party_options.merge(sinew.runtime_options.httparty_options)
-
-      # merge headers
-      headers = sinew.runtime_options.headers
-      headers = headers.merge(party_options[:headers]) if party_options[:headers]
-      party_options[:headers] = headers
-
-      party_response = HTTParty.send(method, uri, party_options)
-      Response.from_network(self, party_response)
+      Response.from_network(self, fday_response)
     end
 
     # We accept sloppy urls and attempt to clean them up
@@ -68,11 +61,11 @@ module Sinew
       s = s.gsub(' ', '%20')
       s = s.gsub("'", '%27')
 
-      # append query manually (instead of letting HTTParty handle it) so we can
-      # include it in cache_key
+      # append query manually (instead of letting Faraday handle it) for consistent
+      # Request#uri and Response#uri
       query = options.delete(:query)
       if query.present?
-        q = HTTParty::HashConversions.to_params(query)
+        q = Faraday::Utils.default_params_encoder.encode(query)
         separator = s.include?('?') ? '&' : '?'
         s = "#{s}#{separator}#{q}"
       end
@@ -81,54 +74,10 @@ module Sinew
     end
     protected :parse_url
 
-    def calculate_cache_key
-      dir = pathify(uri.host)
-
-      body_key = if body.is_a?(Hash)
-        HTTParty::HashConversions.to_params(body)
-      else
-        body&.dup
-      end
-
-      # Build key, as a hash for before_generate_cache_key. Note that :scheme is
-      # just a placeholder in case someone wants to add it for real, so that
-      # it'll appear in the correct order. We remove the placerholder after we
-      # call the proc.
-      key = {
-        method: method.dup,
-        scheme: 'placeholder',
-        path: uri.path,
-        query: uri.query,
-        body: body_key,
-      }
-
-      args = [ key ]
-      if sinew.runtime_options.before_generate_cache_key.arity == 2
-        args << uri
-      end
-      key = sinew.runtime_options.before_generate_cache_key.call(*args)
-
-      # strip defaults
-      key.delete(:scheme) if key[:scheme] == 'placeholder'
-      key.delete(:method) if key[:method] == 'get'
-
-      # pull out the values, join and pathify
-      path = key.values.select(&:present?).join(',')
-      path = pathify(path)
-
-      # shorten long paths
-      if path.length > 250
-        path = Digest::MD5.hexdigest(path)
-      end
-
-      "#{dir}/#{path}"
-    end
-    protected :calculate_cache_key
-
     def validate!
       raise "invalid method #{method}" if !VALID_METHODS.include?(method)
       raise "invalid url #{uri}" if uri.scheme !~ /^http/
-      raise "can't get with a body" if method == 'get' && body
+      raise "can't #{method} with a body" if body && !METHODS_WITH_BODY.include?(method)
       raise "Content-Type doesn't make sense without a body" if content_type && !body
     end
     protected :validate!
@@ -164,7 +113,7 @@ module Sinew
       s = s.gsub(',,', ',')
       # encode invalid path chars
       s = s.gsub(/[^A-Za-z0-9_.,=-]/) do |i|
-        hex = i.unpack('H2').first
+        hex = i.unpack1('H2')
         "%#{hex}"
       end
       # handle empty case

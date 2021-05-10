@@ -7,8 +7,8 @@ module Sinew
     attr_accessor :retries
     attr_accessor :rate_limit
     attr_accessor :headers
-    attr_accessor :httparty_options
-    attr_accessor :before_generate_cache_key
+    attr_accessor :httpdisk_options
+    attr_accessor :insecure
 
     def initialize
       self.retries = 3
@@ -16,8 +16,8 @@ module Sinew
       self.headers = {
         'User-Agent' => "sinew/#{VERSION}",
       }
-      self.httparty_options = {}
-      self.before_generate_cache_key = ->(i) { i }
+      self.httpdisk_options = {}
+      self.insecure = false
 
       # for testing
       if ENV['SINEW_TEST']

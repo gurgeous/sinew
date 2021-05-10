@@ -50,7 +50,7 @@ class TestRecipe < MiniTest::Test
       raise "# OUTPUT not found in recipes/#{filename}"
     end
 
-    output = lines[first_line + 1..-1]
+    output = lines[first_line + 1..]
     output = output.map { |i| i.gsub(/^# /, '') }
     output = output.join("\n")
     output += "\n"
