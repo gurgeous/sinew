@@ -20,7 +20,7 @@ gem 'sinew'
 
 <!--- markdown-toc --no-firsth1 --maxdepth 1 readme.md -->
 
-- [Sinew 2](#sinew-2-may-2018)
+- [Sinew 3](#sinew-3-may-2021)
 - [Quick Example](#quick-example)
 - [How it Works](#how-it-works)
 - [DSL Reference](#dsl-reference)
@@ -29,19 +29,13 @@ gem 'sinew'
 - [Changelog](#changelog)
 - [License](#license)
 
-## Sinew 2 (May 2018)
+## Sinew 3 (May 2021)
 
-I am pleased to announce the release of Sinew 2.0, a complete rewrite of Sinew for the modern era. Enhancements include:
-
-- Remove dependencies on active_support, curl and tidy. We use HTTParty now.
-- Much easier to customize requests in `.sinew` files. For example, setting User-Agent or Bearer tokens.
-- More operations like `post_json` or the generic `http`. These methods are thin wrappers around HTTParty.
-- New end-of-run report.
-- Tests, rubocop, vscode settings, travis, etc.
+I am pleased to announce the release of Sinew 3.0. Sinew has been streamlined and updated to use the [Faraday](https://lostisland.github.io/faraday/) HTTP client with [httpdisk](https://github.com/gurgeous/httpdisk/) middleware for caching.
 
 **Breaking change**
 
-Sinew uses a new format for cached responses. Old Sinew 1 cache directories must be removed before running Sinew again. Sinew 2 might choke on Sinew 1 cache directores when reading `head/`. This is not tested or supported.
+Sinew 3 uses a new format for cached responses. Old Sinew 2 cache directories should be removed before running Sinew again.
 
 ## Quick Example
 
@@ -114,9 +108,9 @@ Sinew creates a CSV file with the same name as the recipe, and `csv_emit(hash)` 
 
 #### Caching
 
-Requests are made using HTTParty, and all responses are cached on disk in `~/.sinew`. Error responses are cached as well. Each URL will be hit exactly once, and requests are rate limited to one per second. Sinew tries to be polite.
+Sinew uses [httpdisk](https://github.com/gurgeous/httpdisk/) to aggressively cache all HTTP responses to disk in `~/.sinew`. Error responses are cached as well. Each URL will be hit exactly once, and requests are rate limited to one per second. Sinew tries to be polite.
 
-The files in `~/.sinew` have nice names and are designed to be human readable. This helps when writing recipes. Sinew never deletes files from the cache - that's up to you!
+Sinew never deletes files from the cache - that's up to you!
 
 Because all requests are cached, you can run Sinew repeatedly with confidence. Run it over and over again while you build up your recipe.
 
