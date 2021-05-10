@@ -15,7 +15,7 @@ jobs:
       max-parallel: 3
       matrix:
         os: [ubuntu, macos]
-        ruby-version: [head, 3.0, 2.7]
+        ruby-version: [3.0, 2.7]
     runs-on: ${{ matrix.os }}-latest
     steps:
       - uses: actions/checkout@v2

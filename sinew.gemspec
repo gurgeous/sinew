@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.homepage    = 'http://github.com/gurgeous/sinew'
   s.summary     = 'Sinew - structured web crawling using recipes.'
   s.description = 'Crawl web sites easily using ruby recipes, with caching and nokogiri.'
-  s.required_ruby_version = '~> 2.7'
+  s.required_ruby_version = '>= 2.7'
 
   # what's in the gem?
   s.files = Dir.chdir(File.expand_path(__dir__)) do
