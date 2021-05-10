@@ -11,6 +11,7 @@ module Sinew
   class Request
     HTML_ENTITIES = HTMLEntities.new
     VALID_METHODS = %w[get post patch put delete head options].freeze
+    METHODS_WITH_BODY = %w[patch post put].freeze
 
     attr_reader :sinew, :method, :uri, :options
 
@@ -76,7 +77,7 @@ module Sinew
     def validate!
       raise "invalid method #{method}" if !VALID_METHODS.include?(method)
       raise "invalid url #{uri}" if uri.scheme !~ /^http/
-      raise "can't get with a body" if method == 'get' && body
+      raise "can't #{method} with a body" if body && !METHODS_WITH_BODY.include?(method)
       raise "Content-Type doesn't make sense without a body" if content_type && !body
     end
     protected :validate!
