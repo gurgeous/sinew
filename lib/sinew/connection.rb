@@ -29,7 +29,8 @@ module Sinew
           dir: options[:cache],
           force: options[:force],
           force_errors: options[:force_errors],
-        }
+        }.merge(runtime_options.httpdisk_options)
+
         _1.use :httpdisk, httpdisk_options
 
         # After httpdisk so that only non-cached requests are logged.

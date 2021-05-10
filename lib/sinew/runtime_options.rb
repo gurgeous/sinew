@@ -7,6 +7,7 @@ module Sinew
     attr_accessor :retries
     attr_accessor :rate_limit
     attr_accessor :headers
+    attr_accessor :httpdisk_options
     attr_accessor :insecure
 
     def initialize
@@ -15,6 +16,7 @@ module Sinew
       self.headers = {
         'User-Agent' => "sinew/#{VERSION}",
       }
+      self.httpdisk_options = {}
       self.insecure = false
 
       # for testing
