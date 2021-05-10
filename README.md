@@ -167,6 +167,11 @@ noko.css("table")[4].css("td").select { |i| i[:width].to_i > 80 }.map(&:text)
 
 ## Changelog
 
+#### 3.0.0 (May 2021)
+
+- Major rewrite of network and caching layer. See above.
+- Use Faraday HTTP client with httpdisk middleware for caching.
+
 #### 2.0.5 (unreleased)
 
 - Supports multiple proxies (`--proxy host1,host2,...`)
