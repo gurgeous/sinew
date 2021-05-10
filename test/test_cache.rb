@@ -58,6 +58,6 @@ class TestCache < MiniTest::Test
       end
     end
     assert_requested :get, 'http://httpbin.org/delay/1', times: 1
-    assert_equal 'execution expired', sinew.dsl.raw
+    assert_empty sinew.dsl.raw
   end
 end
