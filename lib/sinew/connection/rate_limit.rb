@@ -6,7 +6,7 @@ module Sinew
       def initialize(app, options = {})
         super(app)
 
-        @rate_limit = options.fetch(:interval, 1)
+        @rate_limit = options.fetch(:rate_limit, 1)
       end
 
       def on_request(_env)
