@@ -60,4 +60,37 @@ class TestCache < MiniTest::Test
     assert_requested :get, 'http://httpbin.org/delay/1', times: 1
     assert_empty sinew.dsl.raw
   end
+
+  def test_force
+    sinew.options[:force] = true
+
+    2.times do
+      sinew.dsl.get('http://httpbin.org/get', c: 3, d: 4)
+    end
+    if !test_network?
+      assert_requested :get, 'http://httpbin.org/get?c=3&d=4', times: 2
+    end
+  end
+
+  def test_force_errors
+    return if test_network?
+
+    sinew.options[:force_errors] = true
+
+    # gotta set this or the retries mess up our request counts
+    sinew.runtime_options.retries = 0
+
+    2.times do
+      sinew.dsl.get('http://httpbin.org/get', c: 3, d: 4)
+    end
+
+    assert_output(/failed with 999/) do
+      2.times do
+        sinew.dsl.get('http://httpbin.org/delay/1')
+      end
+    end
+
+    assert_requested :get, 'http://httpbin.org/get?c=3&d=4', times: 1
+    assert_requested :get, 'http://httpbin.org/delay/1', times: 2
+  end
 end

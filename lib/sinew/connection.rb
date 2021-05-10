@@ -25,7 +25,16 @@ module Sinew
         _1.response :encoding
 
         # disk caching
-        _1.use :httpdisk, dir: options[:cache]
+        httpdisk_options = {
+          dir: options[:cache],
+          force: options[:force],
+          force_errors: options[:force_errors],
+        }
+        _1.use :httpdisk, httpdisk_options
+
+        # After httpdisk so that only non-cached requests are logged.
+        # Before retry so that we don't log each retry attempt.
+        _1.response :logger, nil, formatter: LogFormatter if !options[:quiet]
 
         # After httpdisk so transient failures are not cached
         retry_options = {
@@ -36,9 +45,6 @@ module Sinew
           retry_if: ->(_env, _err) { true },
         }
         _1.request :retry, retry_options
-
-        # After httpdisk so that only non-cached requests are logged
-        _1.response :logger, nil, formatter: LogFormatter if !options[:quiet]
       end
     end
   end
