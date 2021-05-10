@@ -6,6 +6,7 @@ module Sinew
       def initialize(app, options = {})
         super(app)
 
+        @last_request_tm = @current_request_tm = nil
         @rate_limit = options.fetch(:rate_limit, 1)
       end
 

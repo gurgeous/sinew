@@ -1,4 +1,4 @@
-![Travis](https://travis-ci.org/gurgeous/sinew.svg?branch=master)
+[![Build Status](https://github.com/gurgeous/sinew/workflows/test/badge.svg?branch=master)](https://github.com/gurgeous/sinew/action)
 
 ## Welcome to Sinew
 
@@ -31,7 +31,7 @@ gem 'sinew'
 
 ## Sinew 3 (May 2021)
 
-I am pleased to announce the release of Sinew 3.0. Sinew has been streamlined and updated to use the [Faraday](https://lostisland.github.io/faraday/) HTTP client with [httpdisk](https://github.com/gurgeous/httpdisk/) middleware for caching.
+I am pleased to announce the release of Sinew 3.0. Sinew has been streamlined and updated to use the [Faraday](https://lostisland.github.io/faraday/) HTTP client with [sinew](https://github.com/gurgeous/sinew/) middleware for caching.
 
 **Breaking change**
 
@@ -39,11 +39,11 @@ Sinew 3 uses a new format for cached responses. Old Sinew 2 cache directories sh
 
 ## Quick Example
 
-Here's an example for collecting the links from httpbin.org:
+Here's an example for collecting the links from httpbingo.org:
 
 ```ruby
 # get the url
-get "http://httpbin.org"
+get "http://httpbingo.org"
 
 # use nokogiri to collect links
 noko.css("ul li a").each do |a|
@@ -108,7 +108,7 @@ Sinew creates a CSV file with the same name as the recipe, and `csv_emit(hash)` 
 
 #### Caching
 
-Sinew uses [httpdisk](https://github.com/gurgeous/httpdisk/) to aggressively cache all HTTP responses to disk in `~/.sinew`. Error responses are cached as well. Each URL will be hit exactly once, and requests are rate limited to one per second. Sinew tries to be polite.
+Sinew uses [sinew](https://github.com/gurgeous/sinew/) to aggressively cache all HTTP responses to disk in `~/.sinew`. Error responses are cached as well. Each URL will be hit exactly once, and requests are rate limited to one per second. Sinew tries to be polite.
 
 Sinew never deletes files from the cache - that's up to you!
 
@@ -156,7 +156,7 @@ Writing Sinew recipes is fun and easy. The builtin caching means you can iterate
 noko.css("table")[4].css("td").select { |i| i[:width].to_i > 80 }.map(&:text)
 ```
 
-- Debug your recipes using plain old `puts`, or better yet use `ap` from [awesome_print](https://github.com/michaeldv/awesome_print).
+- Debug your recipes using plain old `puts`, or better yet use `ap` from [amazing_print](https://github.com/amazing-print/amazing_print).
 - Run `sinew -v` to get a report on every `csv_emit`. Very handy.
 - Add the CSV files to your git repo. That way you can version them and get diffs!
 
@@ -170,10 +170,7 @@ noko.css("table")[4].css("td").select { |i| i[:width].to_i > 80 }.map(&:text)
 #### 3.0.0 (May 2021)
 
 - Major rewrite of network and caching layer. See above.
-- Use Faraday HTTP client with httpdisk middleware for caching.
-
-#### 2.0.5 (unreleased)
-
+- Use Faraday HTTP client with sinew middleware for caching.
 - Supports multiple proxies (`--proxy host1,host2,...`)
 
 #### 2.0.4 (May 2018)
