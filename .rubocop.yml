@@ -27,6 +27,7 @@ Naming/BinaryOperatorParameterName: { Enabled: false } # silly
 Naming/HeredocDelimiterNaming: { Enabled: false } # silly
 Naming/MethodParameterName: { Enabled: false } # silly
 Style/AccessorGrouping: { Enabled: false } # silly
+Style/AsciiComments: { Enabled: false } # silly
 Style/ClassAndModuleChildren: { Enabled: false } # silly
 Style/Documentation: { Enabled: false } # we don't need this
 Style/DoubleNegation: { Enabled: false } # silly

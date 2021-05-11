@@ -1,5 +1,5 @@
 # This tests get by URI, URI math, and csv_emit with uri
-get(URI.parse('http://httpbin.org/html'))
+get(URI.parse('http://httpbingo.org/html'))
 csv_emit(url: uri)
 
 get(uri + '../get')
@@ -7,5 +7,5 @@ csv_emit(url: uri)
 
 # OUTPUT
 # url
-# http://httpbin.org/html
-# http://httpbin.org/get
+# http://httpbingo.org/html
+# http://httpbingo.org/get
