@@ -39,7 +39,7 @@ Sinew 3 uses a new format for cached responses. Old Sinew 2 cache directories sh
 
 ## Quick Example
 
-Here's an example for collecting the links from httpbingo.org:
+Here's an example for collecting the links from httpbingo.org. Paste this into a file called `sample.sinew` and run `sinew sample.sinew`. It will create a `sample.csv` file containing the href and text for each link:
 
 ```ruby
 # get the url
@@ -55,8 +55,6 @@ noko.css("ul li a").each do |a|
   csv_emit(row)
 end
 ```
-
-If you paste this into a file called `sample.sinew` and run `sinew sample.sinew`, it will create a `sample.csv` file containing the href and text for each link.
 
 ## How it Works
 
@@ -108,7 +106,7 @@ Sinew creates a CSV file with the same name as the recipe, and `csv_emit(hash)` 
 
 #### Caching
 
-Sinew uses [sinew](https://github.com/gurgeous/sinew/) to aggressively cache all HTTP responses to disk in `~/.sinew`. Error responses are cached as well. Each URL will be hit exactly once, and requests are rate limited to one per second. Sinew tries to be polite.
+Sinew uses [httpdisk](https://github.com/gurgeous/httpdisk/) to aggressively cache all HTTP responses to disk in `~/.sinew`. Error responses are cached as well. Each URL will be hit exactly once, and requests are rate limited to one per second. Sinew tries to be polite.
 
 Sinew never deletes files from the cache - that's up to you!
 

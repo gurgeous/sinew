@@ -27,10 +27,9 @@ module Sinew
     end
 
     def proxy
-      @proxy ||= begin
-        if proxies = sinew.options[:proxy]
-          proxies.split(',').sample
-        end
+      @proxy ||= if sinew.options[:proxy]
+        proxy = sinew.options[:proxy].split(',').sample
+        parse_proxy(proxy) || raise(ArgumentError, "invalid proxy #{proxy}")
       end
     end
 
@@ -123,5 +122,21 @@ module Sinew
       s
     end
     protected :pathify
+
+    def parse_proxy(proxy)
+      host, port = proxy.split(':', 2)
+      return if !host || host.empty?
+      return if port&.empty?
+
+      URI.parse('http://placeholder').tap do
+        begin
+          _1.host = host
+          _1.port = port if port
+        rescue URI::InvalidComponentError
+          return
+        end
+      end.to_s
+    end
+    protected :parse_proxy
   end
 end
