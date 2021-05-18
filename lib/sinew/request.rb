@@ -11,36 +11,26 @@ module Sinew
     VALID_METHODS = %w[get post patch put delete head options].freeze
     METHODS_WITH_BODY = %w[patch post put].freeze
 
-    attr_reader :sinew, :method, :uri, :options
+    attr_reader :method, :options, :uri
 
     # Supported options:
     #  body: Body of http post
     #  headers: Hash of HTTP headers (combined with runtime_options.headers)
     #  query: Hash of query parameters to add to url
-    def initialize(sinew, method, url, options = {})
-      @sinew = sinew
+    def initialize(method, url, options = {})
       @method = method
       @options = options.dup
       @uri = parse_url(url)
-    end
-
-    def proxy
-      @proxy ||= if sinew.options[:proxy]
-        parse_proxy(sinew.options[:proxy].split(',').sample)
-      end
     end
 
     # run the request, return the result
     def perform(connection)
       validate!
 
-      headers = sinew.runtime_options.headers
-      headers = headers.merge(options[:headers]) if options[:headers]
-
       body = options.delete(:body)
-
-      fday_response = connection.send(method, uri, body, headers) do
-        _1.options[:proxy] = proxy
+      fday_response = connection.send(method, uri, body) do
+        _1.headers.update(options[:headers]) if options[:headers]
+        _1.options[:proxy] = options[:proxy]
       end
 
       Response.from_network(self, fday_response)
@@ -69,16 +59,6 @@ module Sinew
       URI.parse(s)
     end
     protected :parse_url
-
-    PROXY_RE = /\A#{URI::PATTERN::HOST}(:\d+)?\Z/
-
-    def parse_proxy(proxy)
-      if proxy !~ PROXY_RE
-        raise ArgumentError, "invalid proxy #{proxy.inspect}, should be host[:port]"
-      end
-      "http://#{proxy}"
-    end
-    protected :parse_proxy
 
     def validate!
       raise "invalid method #{method}" if !VALID_METHODS.include?(method)

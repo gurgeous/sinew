@@ -34,7 +34,7 @@ module Sinew
     #
 
     def http(method, url, options = {})
-      request = Request.new(self, method, url, options)
+      request = Request.new(method, url, request_options(options))
       response = request.perform(connection)
 
       # always log error messages
@@ -61,6 +61,32 @@ module Sinew
     #
     # helpers
     #
+
+    def request_options(options)
+      options.dup.tap do |req|
+        req[:headers] = {}.tap do |h|
+          [ runtime_options.headers, options[:headers]].each do
+            h.merge!(_1) if _1
+          end
+        end
+        req[:proxy] = random_proxy
+      end
+    end
+    protected :request_options
+
+    PROXY_RE = /\A#{URI::PATTERN::HOST}(:\d+)?\Z/.freeze
+
+    def random_proxy
+      return if !options[:proxy]
+
+      proxy = options[:proxy].split(',').sample
+      if proxy !~ PROXY_RE
+        raise ArgumentError, "invalid proxy #{proxy.inspect}, should be host[:port]"
+      end
+
+      "http://#{proxy}"
+    end
+    protected :random_proxy
 
     def footer
       output.report
