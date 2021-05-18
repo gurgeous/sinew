@@ -1,5 +1,4 @@
-require 'digest/md5'
-require 'htmlentities'
+require 'sterile'
 
 #
 # Process a single HTTP request.
@@ -9,7 +8,6 @@ module Sinew
   class Error < StandardError; end
 
   class Request
-    HTML_ENTITIES = HTMLEntities.new
     VALID_METHODS = %w[get post patch put delete head options].freeze
     METHODS_WITH_BODY = %w[patch post put].freeze
 
@@ -28,8 +26,7 @@ module Sinew
 
     def proxy
       @proxy ||= if sinew.options[:proxy]
-        proxy = sinew.options[:proxy].split(',').sample
-        parse_proxy(proxy) || raise(ArgumentError, "invalid proxy #{proxy}")
+        parse_proxy(sinew.options[:proxy].split(',').sample)
       end
     end
 
@@ -51,10 +48,10 @@ module Sinew
 
     # We accept sloppy urls and attempt to clean them up
     def parse_url(url)
-      s = url
+      s = url.to_s
 
       # remove entities
-      s = HTML_ENTITIES.decode(s)
+      s = Sterile.decode_entities(s)
 
       # fix a couple of common encoding bugs
       s = s.gsub(' ', '%20')
@@ -72,6 +69,16 @@ module Sinew
       URI.parse(s)
     end
     protected :parse_url
+
+    PROXY_RE = /\A#{URI::PATTERN::HOST}(:\d+)?\Z/
+
+    def parse_proxy(proxy)
+      if proxy !~ PROXY_RE
+        raise ArgumentError, "invalid proxy #{proxy.inspect}, should be host[:port]"
+      end
+      "http://#{proxy}"
+    end
+    protected :parse_proxy
 
     def validate!
       raise "invalid method #{method}" if !VALID_METHODS.include?(method)
@@ -95,48 +102,5 @@ module Sinew
       headers && headers['Content-Type']
     end
     protected :content_type
-
-    def form?
-      content_type == 'application/x-www-form-urlencoded'
-    end
-    protected :form?
-
-    def pathify(s)
-      # remove leading slash
-      s = s.gsub(/^\//, '')
-      # .. => comma
-      s = s.gsub('..', ',')
-      # query separators => comma
-      s = s.gsub(/[?\/&]/, ',')
-      # ,, => comma
-      s = s.gsub(',,', ',')
-      # encode invalid path chars
-      s = s.gsub(/[^A-Za-z0-9_.,=-]/) do |i|
-        hex = i.unpack1('H2')
-        "%#{hex}"
-      end
-      # handle empty case
-      s = '_root_' if s.blank?
-      # always downcase
-      s = s.downcase
-      s
-    end
-    protected :pathify
-
-    def parse_proxy(proxy)
-      host, port = proxy.split(':', 2)
-      return if !host || host.empty?
-      return if port&.empty?
-
-      URI.parse('http://placeholder').tap do
-        begin
-          _1.host = host
-          _1.port = port if port
-        rescue URI::InvalidComponentError
-          return
-        end
-      end.to_s
-    end
-    protected :parse_proxy
   end
 end
