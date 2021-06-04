@@ -65,7 +65,7 @@ module Sinew
     def request_options(options)
       options.dup.tap do |req|
         req[:headers] = {}.tap do |h|
-          [ runtime_options.headers, options[:headers]].each do
+          [runtime_options.headers, options[:headers]].each do
             h.merge!(_1) if _1
           end
         end

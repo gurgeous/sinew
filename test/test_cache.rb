@@ -8,7 +8,7 @@ class TestCache < MiniTest::Test
     if !test_network?
       assert_requested :get, 'http://httpbingo.org/get?c=3&d=4', times: 1
     end
-    assert_equal({ c: [ '3' ], d: [ '4' ] }, sinew.dsl.json[:args])
+    assert_equal({ c: ['3'], d: ['4'] }, sinew.dsl.json[:args])
   end
 
   def test_post
@@ -18,7 +18,7 @@ class TestCache < MiniTest::Test
     if !test_network?
       assert_requested :post, 'http://httpbingo.org/post', times: 1
     end
-    assert_equal({ c: [ '5' ], d: [ '6' ] }, sinew.dsl.json[:form])
+    assert_equal({ c: ['5'], d: ['6'] }, sinew.dsl.json[:form])
   end
 
   def test_redirect

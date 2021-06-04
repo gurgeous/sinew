@@ -78,7 +78,7 @@ module Sinew
         row.each_pair { |k, v| counts[k] += 1 if v.present? }
       end
       # sort by counts
-      cols = columns.sort_by { |i| [ -counts[i], i ] }
+      cols = columns.sort_by { |i| [-counts[i], i] }
 
       # report
       len = cols.map { |i| i.to_s.length }.max
@@ -91,13 +91,13 @@ module Sinew
     def normalize(s)
       # noko/array/misc => string
       s = case s
-      when Nokogiri::XML::Element, Nokogiri::XML::NodeSet
-        s.inner_html
-      when Array
-        s.map(&:to_s).join('|')
-      else
-        s.to_s
-      end
+          when Nokogiri::XML::Element, Nokogiri::XML::NodeSet
+            s.inner_html
+          when Array
+            s.map(&:to_s).join('|')
+          else
+            s.to_s
+          end
 
       # strip html tags. Note that we replace tags with spaces
       s = s.gsub(/<[^>]+>/, ' ')

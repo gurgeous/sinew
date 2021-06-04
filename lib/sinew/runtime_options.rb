@@ -14,7 +14,7 @@ module Sinew
       self.retries = 3
       self.rate_limit = 1
       self.headers = {
-        'User-Agent' => "sinew/#{VERSION}",
+        'User-Agent' => "sinew/#{VERSION}"
       }
       self.httpdisk_options = {}
       self.insecure = false

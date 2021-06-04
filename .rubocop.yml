@@ -1,52 +1,32 @@
 AllCops:
-  TargetRubyVersion: 2.7
   NewCops: enable
-
-# amd: customizations
-Layout/SpaceInsideArrayLiteralBrackets:
-  EnforcedStyle: compact
-Layout/CaseIndentation:
-  EnforcedStyle: end
-Layout/EndAlignment:
-  EnforcedStyleAlignWith: variable
-Style/CollectionMethods:
-  Enabled: true
-  PreferredMethods:
-    reduce: inject
-Style/EmptyMethod:
-  Enabled: false
-Style/TrailingCommaInArrayLiteral:
-  EnforcedStyleForMultiline: consistent_comma
-Style/TrailingCommaInHashLiteral:
-  EnforcedStyleForMultiline: consistent_comma
+  SuggestExtensions: false
+  TargetRubyVersion: 2.7
 
 # amd: these seem extreme
-Lint/AssignmentInCondition: { Enabled: false } # I do this all the time
-Lint/SuppressedException: { Enabled: false } # blank rescues are useful
-Naming/BinaryOperatorParameterName: { Enabled: false } # silly
-Naming/HeredocDelimiterNaming: { Enabled: false } # silly
-Naming/MethodParameterName: { Enabled: false } # silly
-Style/AccessorGrouping: { Enabled: false } # silly
-Style/AsciiComments: { Enabled: false } # silly
-Style/ClassAndModuleChildren: { Enabled: false } # silly
-Style/Documentation: { Enabled: false } # we don't need this
-Style/DoubleNegation: { Enabled: false } # silly
-Style/FormatStringToken: { Enabled: false } # we like printf here
-Style/FrozenStringLiteralComment: { Enabled: false } # seems excessive
-Style/GuardClause: { Enabled: false } # confusing
-Style/HashTransformValues: { Enabled: false } # breaks code by trying to apply to an array
-Style/IfUnlessModifier: { Enabled: false } # personally I hate unless
-Style/NegatedIf: { Enabled: false } # these are fine
-Style/Next: { Enabled: false } # these are fine
-Style/NumericPredicate: { Enabled: false } # silly
-Style/ParallelAssignment: { Enabled: false } # these are fine
-Style/PerlBackrefs: { Enabled: false } # these are fine
-Style/RaiseArgs: { Enabled: false } # silly
-Style/RedundantAssignment: { Enabled: false } # these are usually on purpose
-Style/RegexpLiteral: { Enabled: false } # these are fine
-Style/SoleNestedConditional: { Enabled: false } # these are fine
-Style/StderrPuts: { Enabled: false } # this is awful
-
-# amd: these Metric rules are annoying, disable
-Metrics:
-  Enabled: false
+Lint/AssignmentInCondition: { Enabled: false }
+Lint/SuppressedException: { Enabled: false }
+Metrics: { Enabled: false }
+Naming/BinaryOperatorParameterName: { Enabled: false }
+Naming/HeredocDelimiterNaming: { Enabled: false }
+Naming/MethodParameterName: { Enabled: false }
+Style/AccessorGrouping: { Enabled: false }
+Style/AsciiComments: { Enabled: false }
+Style/ClassAndModuleChildren: { Enabled: false }
+Style/Documentation: { Enabled: false }
+Style/DoubleNegation: { Enabled: false }
+Style/FormatStringToken: { Enabled: false }
+Style/FrozenStringLiteralComment: { Enabled: false }
+Style/GuardClause: { Enabled: false }
+Style/HashTransformValues: { Enabled: false }
+Style/IfUnlessModifier: { Enabled: false }
+Style/NegatedIf: { Enabled: false }
+Style/Next: { Enabled: false }
+Style/NumericPredicate: { Enabled: false }
+Style/ParallelAssignment: { Enabled: false }
+Style/PerlBackrefs: { Enabled: false }
+Style/RaiseArgs: { Enabled: false }
+Style/RedundantAssignment: { Enabled: false }
+Style/RegexpLiteral: { Enabled: false }
+Style/SoleNestedConditional: { Enabled: false }
+Style/StderrPuts: { Enabled: false }

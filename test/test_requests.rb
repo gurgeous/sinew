@@ -9,10 +9,10 @@ class TestRequests < MiniTest::Test
   def test_basic_methods
     sinew.dsl.get('http://httpbingo.org/get', a: 1, b: 2)
     assert_equal(200, sinew.dsl.code)
-    assert_equal({ a: [ '1' ], b: [ '2' ] }, sinew.dsl.json[:args])
+    assert_equal({ a: ['1'], b: ['2'] }, sinew.dsl.json[:args])
 
     sinew.dsl.post('http://httpbingo.org/post', a: 1, b: 2)
-    assert_equal({ a: [ '1' ], b: [ '2' ] }, sinew.dsl.json[:form])
+    assert_equal({ a: ['1'], b: ['2'] }, sinew.dsl.json[:form])
 
     sinew.dsl.post_json('http://httpbingo.org/post', a: 1, b: 2)
     assert_equal({ a: 1, b: 2 }, sinew.dsl.json[:json])
@@ -53,7 +53,7 @@ class TestRequests < MiniTest::Test
     errors = [
       Errno::ECONNREFUSED,
       OpenSSL::SSL::SSLError.new,
-      SocketError.new,
+      SocketError.new
     ]
     errors.each_with_index do |error, index|
       stub_request(:get, %r{http://[^/]+/error#{index}}).to_return { raise error }
@@ -80,7 +80,7 @@ class TestRequests < MiniTest::Test
     assert_equal 'done', sinew.dsl.raw
   end
 
-  def test_retry_500
+  def test_retry500
     skip if test_network?
 
     errors = 2

@@ -15,21 +15,17 @@ $LOAD_PATH.unshift("#{__dir__}/../lib")
 require 'sinew'
 
 class MiniTest::Test
-  TMP = '/tmp/_test_sinew'.freeze
   HTML = File.read("#{__dir__}/test.html")
 
   def setup
     super
 
-    # prepare TMP
-    FileUtils.rm_rf(TMP)
-    FileUtils.mkdir_p(TMP)
-
+    @tmpdir = Dir.mktmpdir('sinew')
     stub_network unless test_network?
   end
 
   def sinew
-    @sinew ||= Sinew::Main.new(cache: TMP, quiet: true, recipe: "#{TMP}/ignore.sinew")
+    @sinew ||= Sinew::Main.new(cache: @tmpdir, quiet: true, recipe: "#{@tmpdir}/ignore.sinew")
   end
   protected :sinew
 
@@ -88,10 +84,10 @@ class MiniTest::Test
 
     # args
     response[:args] = if request.uri.query
-      CGI.parse(request.uri.query)
-    else
-      {}
-    end
+                        CGI.parse(request.uri.query)
+                      else
+                        {}
+                      end
 
     # form
     if request.headers['Content-Type'] == 'application/x-www-form-urlencoded'
@@ -105,7 +101,7 @@ class MiniTest::Test
 
     {
       headers: { 'Content-Type' => 'application/json' },
-      body: response.to_json,
+      body: response.to_json
     }
   end
   protected :respond_echo

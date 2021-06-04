@@ -21,7 +21,7 @@ class TestOutput < MiniTest::Test
     assert_equal '', output.send(:normalize, '')
     assert_equal 'text', output.send(:normalize, 'text')
     assert_equal '123', output.send(:normalize, 123)
-    assert_equal('1|2', output.send(:normalize, [ 1, 2 ]))
+    assert_equal('1|2', output.send(:normalize, [1, 2]))
 
     #
     # nokogiri

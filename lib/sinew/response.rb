@@ -65,7 +65,7 @@ module Sinew
       {
         uri: uri,
         code: code,
-        headers: headers,
+        headers: headers
       }
     end
   end

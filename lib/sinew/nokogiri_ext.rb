@@ -21,6 +21,7 @@ class Nokogiri::XML::Node
     t&.text
   end
 end
+
 class Nokogiri::XML::NodeSet
   def text_just_me
     map(&:text_just_me).join(' ')

@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    sinew (3.0.1)
+    sinew (4.0.0)
       amazing_print (~> 1.3)
       faraday (~> 1.4)
       faraday-encoding (~> 0)
@@ -64,17 +64,17 @@ GEM
     rake (13.0.3)
     regexp_parser (2.1.1)
     rexml (3.2.5)
-    rubocop (0.91.1)
+    rubocop (1.13.0)
       parallel (~> 1.10)
-      parser (>= 2.7.1.1)
+      parser (>= 3.0.0.0)
       rainbow (>= 2.2.2, < 4.0)
-      regexp_parser (>= 1.7)
+      regexp_parser (>= 1.8, < 3.0)
       rexml
-      rubocop-ast (>= 0.4.0, < 1.0)
+      rubocop-ast (>= 1.2.0, < 2.0)
       ruby-progressbar (~> 1.7)
-      unicode-display_width (>= 1.4.0, < 2.0)
-    rubocop-ast (0.8.0)
-      parser (>= 2.7.1.5)
+      unicode-display_width (>= 1.4.0, < 3.0)
+    rubocop-ast (1.5.0)
+      parser (>= 3.0.1.1)
     ruby-progressbar (1.11.0)
     ruby2_keywords (0.0.4)
     scripto (0.0.4)
@@ -84,7 +84,7 @@ GEM
     unf (0.1.4)
       unf_ext
     unf_ext (0.0.7.7)
-    unicode-display_width (1.7.0)
+    unicode-display_width (2.0.0)
     webmock (3.12.2)
       addressable (>= 2.3.6)
       crack (>= 0.3.2)
@@ -97,7 +97,7 @@ DEPENDENCIES
   minitest
   mocha
   rake
-  rubocop (~> 0.91.0)
+  rubocop (~> 1.13.0)
   sinew!
   webmock
 

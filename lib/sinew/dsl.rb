@@ -39,7 +39,7 @@ module Sinew
     def post(url, form = {})
       body = form
       headers = {
-        'Content-Type' => 'application/x-www-form-urlencoded',
+        'Content-Type' => 'application/x-www-form-urlencoded'
       }
       http('post', url, body: body, headers: headers)
     end
@@ -47,7 +47,7 @@ module Sinew
     def post_json(url, json = {})
       body = json.to_json
       headers = {
-        'Content-Type' => 'application/json',
+        'Content-Type' => 'application/json'
       }
       http('post', url, body: body, headers: headers)
     end

@@ -2,17 +2,18 @@ require_relative 'test_helper'
 
 class TestRecipe < MiniTest::Test
   DIR = File.expand_path('recipes', __dir__)
-  TEST_SINEW = "#{TMP}/test.sinew".freeze
-  TEST_CSV = "#{TMP}/test.csv".freeze
 
   def test_recipes
+    test_sinew = "#{@tmpdir}/test.sinew".freeze
+    test_csv = "#{@tmpdir}/test.csv".freeze
+
     Dir.chdir(DIR) do
       Dir['*.sinew'].sort.each do |filename|
         recipe = IO.read(filename)
 
         # get ready
-        IO.write(TEST_SINEW, recipe)
-        sinew = Sinew::Main.new(cache: TMP, quiet: true, recipe: TEST_SINEW)
+        IO.write(test_sinew, recipe)
+        sinew = Sinew::Main.new(cache: @tmpdir, quiet: true, recipe: test_sinew)
 
         # read OPTIONS
         if options = options_from(recipe)
@@ -28,7 +29,7 @@ class TestRecipe < MiniTest::Test
         sinew.run
 
         # assert
-        csv = IO.read(TEST_CSV)
+        csv = IO.read(test_csv)
         assert_equal(output, csv, "Output didn't match for recipes/#{filename}")
       end
     end
