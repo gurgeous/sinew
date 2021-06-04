@@ -29,7 +29,7 @@ module Sinew
       # load file
       require(File.expand_path(path))
       klass = IO.read(path)[/class ([A-Z][A-Za-z0-9_]*)\s*<\s*Sinew::Base/, 1]
-      raise "could not find a Sinew subclass in #{path.inspect}" if !klass
+      raise "could not find a Sinew::Base subclass in #{path.inspect}" if !klass
 
       # instantiate
       Object.const_get(klass).new(options)
