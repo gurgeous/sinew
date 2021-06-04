@@ -1,4 +1,4 @@
-module Sinews
+module Sinew
   class Main
     attr_reader :options
 
@@ -29,7 +29,7 @@ module Sinews
 
       # load file
       require(File.expand_path(path))
-      klass = IO.read(path)[/class ([A-Z][A-Za-z0-9_]*)\s*<\s*Sinew/, 1]
+      klass = IO.read(path)[/class ([A-Z][A-Za-z0-9_]*)\s*<\s*Sinew::Base/, 1]
       raise CliError, "could not find a Sinew subclass in #{path.inspect}" if !klass
 
       # instantiate

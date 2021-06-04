@@ -26,7 +26,7 @@ module MiniTest
     end
 
     def sinew
-      @sinew ||= Sinews::Main.new(dir: @tmpdir, quiet: true, recipe: "#{@tmpdir}/ignore.sinew")
+      @sinew ||= Sinew::Main.new(dir: @tmpdir, quiet: true, recipe: "#{@tmpdir}/ignore.sinew")
     end
     protected :sinew
 

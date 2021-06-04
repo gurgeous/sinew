@@ -1,4 +1,4 @@
-module Sinews
+module Sinew
   module Middleware
     class LogFormatter < Faraday::Logging::Formatter
       def request(env)

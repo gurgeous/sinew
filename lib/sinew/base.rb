@@ -4,8 +4,9 @@ require 'faraday/logging/formatter'
 require 'faraday-rate_limiter'
 require 'httpdisk'
 
-module Sinews
+module Sinew
   class Base
+    # these have a sinew_xxx prefix to avoid collisions
     attr_reader :sinew_csv, :sinew_mutex, :sinew_options
 
     def initialize(options = {})
@@ -75,8 +76,6 @@ module Sinews
     #
 
     def csv_header(*columns)
-      raise 'already started' if sinew_csv.started?
-
       sinew_csv.start(columns.flatten)
     end
 
@@ -90,7 +89,7 @@ module Sinews
         print = sinew_csv.emit(row)
         puts print.ai if sinew_options[:verbose]
 
-        # this is caught by Sinews::Main
+        # this is caught by Sinew::Main
         if sinew_csv.count == sinew_options[:limit]
           raise LimitError
         end

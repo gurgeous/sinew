@@ -5,7 +5,7 @@ require 'zlib'
 # An HTTP response.
 #
 
-module Sinews
+module Sinew
   class Response
     attr_accessor :request, :uri, :body, :code, :headers
 

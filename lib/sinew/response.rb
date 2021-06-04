@@ -4,7 +4,7 @@ require 'json'
 require 'nokogiri'
 require 'sterile'
 
-module Sinews
+module Sinew
   class Response < SimpleDelegator
     def html
       @html ||= body.dup.tap do

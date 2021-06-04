@@ -1,7 +1,7 @@
 require 'csv'
 require 'sterile'
 
-module Sinews
+module Sinew
   class CSV
     attr_reader :columns, :count, :csv, :recipe_path, :tally
 
@@ -22,6 +22,8 @@ module Sinews
 
     # start writing
     def start(columns)
+      raise 'started twice' if started?
+
       @columns = columns
       @tally = columns.map { [_1, 0] }.to_h
       @csv = ::CSV.open(path, 'wb').tap do

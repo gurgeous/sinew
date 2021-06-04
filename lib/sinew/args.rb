@@ -1,8 +1,8 @@
 # manually load dependencies here since this is loaded standalone by bin
-require 'sinews/version'
+require 'sinew/version'
 require 'slop'
 
-module Sinews
+module Sinew
   module Args
     def self.slop(args)
       slop = Slop.parse(args) do |o|
@@ -15,7 +15,7 @@ module Sinews
         o.bool '--force-errors', "don't read errors from cache (but still write)"
         o.string '--proxy', 'use host[:port] as HTTP proxy (can be a comma-delimited list)'
         o.boolean '--version', 'show version' do
-          puts "sinew #{Sinews::VERSION}"
+          puts "sinew #{Sinew::VERSION}"
           exit
         end
         o.on('--help', 'show this help') do

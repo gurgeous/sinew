@@ -20,9 +20,9 @@ BIN = File.basename($PROGRAM_NAME)
 # Load the bare minimum and parse args with slop. We do this separately for speed.
 #
 
-require 'sinews/args'
+require 'sinew/args'
 begin
-  slop = Sinews::Args.slop(ARGV)
+  slop = Sinew::Args.slop(ARGV)
 rescue Slop::Error => e
   $stderr.puts "#{BIN}: #{e}" if e.message != ''
   $stderr.puts("#{BIN}: try '#{BIN} --help' for more information")
@@ -34,4 +34,4 @@ end
 #
 
 require 'sinew'
-Sinews::Main.new(slop).run
+Sinew::Main.new(slop).run

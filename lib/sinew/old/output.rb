@@ -6,7 +6,7 @@ require 'sterile'
 # CSV output.
 #
 
-module Sinews
+module Sinew
   class Output
     attr_reader :sinew, :columns, :rows, :urls, :csv
 

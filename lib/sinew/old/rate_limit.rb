@@ -1,4 +1,4 @@
-module Sinews
+module Sinew
   module Connection
     class RateLimit < Faraday::Middleware
       attr_reader :rate_limit

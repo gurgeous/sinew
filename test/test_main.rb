@@ -14,7 +14,7 @@ class TestMain < MiniTest::Test
 
   def test_rate_limit
     # don't sleep, but expect it to get called
-    Sinews::Connection::RateLimit.any_instance.expects(:sleep)
+    Sinew::Connection::RateLimit.any_instance.expects(:sleep)
 
     sinew.runtime_options.rate_limit = 1
     sinew.dsl.get('http://httpbingo.org/html')
@@ -23,7 +23,7 @@ class TestMain < MiniTest::Test
 
   def test_gunzip
     body = Base64.decode64('H4sICBRI61oAA2d1Yi50eHQASy9N4gIAJlqRYgQAAAA=')
-    body = Sinews::Response.process_body(OpenStruct.new(body: body))
+    body = Sinew::Response.process_body(OpenStruct.new(body: body))
     assert_equal 'gub', body.strip
   end
 end

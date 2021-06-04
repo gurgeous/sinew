@@ -2,16 +2,16 @@ require_relative 'test_helper'
 
 class TestOutput < MiniTest::Test
   def test_filenames
-    sinew = Sinews::Main.new(recipe: 'gub.sinew')
+    sinew = Sinew::Main.new(recipe: 'gub.sinew')
     assert_equal 'gub.csv', sinew.output.filename
-    sinew = Sinews::Main.new(recipe: 'gub')
+    sinew = Sinew::Main.new(recipe: 'gub')
     assert_equal 'gub.csv', sinew.output.filename
-    sinew = Sinews::Main.new(recipe: '/somewhere/gub.sinew')
+    sinew = Sinew::Main.new(recipe: '/somewhere/gub.sinew')
     assert_equal '/somewhere/gub.csv', sinew.output.filename
   end
 
   def test_normalization
-    output = Sinews::Output.new(nil)
+    output = Sinew::Output.new(nil)
 
     #
     # simple types

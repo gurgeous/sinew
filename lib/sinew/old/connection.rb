@@ -2,10 +2,10 @@ require 'faraday'
 require 'faraday-encoding'
 require 'faraday/logging/formatter'
 require 'httpdisk'
-require 'sinews/connection/log_formatter'
-require 'sinews/connection/rate_limit'
+require 'sinew/connection/log_formatter'
+require 'sinew/connection/rate_limit'
 
-module Sinews
+module Sinew
   module Connection
     def self.create(options:, runtime_options:)
       connection_options = {}

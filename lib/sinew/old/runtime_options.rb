@@ -2,7 +2,7 @@
 # Runtime options that sinew files can modify.
 #
 
-module Sinews
+module Sinew
   class RuntimeOptions
     attr_accessor :retries, :rate_limit, :headers, :httpdisk_options, :insecure
 

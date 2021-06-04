@@ -6,7 +6,7 @@ require 'json'
 # The DSL available to .sinew files.
 #
 
-module Sinews
+module Sinew
   class DSL
     # this is used to break out of --limit
     class LimitError < StandardError; end

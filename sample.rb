@@ -1,4 +1,4 @@
-class Sample < Sinew
+class Sample < Sinew::Base
   def run
     response = get 'http://httpbingo.org'
     response.noko.css('ul li a').each do |a|

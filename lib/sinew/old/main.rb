@@ -1,11 +1,11 @@
 require 'scripto'
-require 'sinews/connection'
+require 'sinew/connection'
 
 #
 # Main sinew entry point.
 #
 
-module Sinews
+module Sinew
   class Main < Scripto::Main
     attr_reader :runtime_options
 
