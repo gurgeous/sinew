@@ -1,4 +1,5 @@
 # manually load dependencies here since this is loaded standalone by bin
+require 'sinew/slop_duration'
 require 'sinew/version'
 require 'slop'
 
@@ -21,7 +22,7 @@ module Sinew
 
         o.separator 'From httpdisk:'
         o.string '--dir', 'set custom cache directory'
-        o.string '--expires', 'when to expire cached requests (ex: 1h, 2d, 3w)'
+        o.duration '--expires', 'when to expire cached requests (ex: 1h, 2d, 3w)'
         o.bool '--force', "don't read anything from cache (but still write)"
         o.bool '--force-errors', "don't read errors from cache (but still write)"
 
@@ -36,12 +37,11 @@ module Sinew
         end
       end
 
-      # look for recipe argument
-      raise Slop::Error, '' if args.empty?
-      raise Slop::Error, 'more than one RECIPE specified' if slop.args.length > 1
-
+      # recipe argument
       recipe = slop.args.first
+      raise Slop::Error, '' if args.empty?
       raise Slop::Error, 'no RECIPE specified' if !recipe
+      raise Slop::Error, 'more than one RECIPE specified' if slop.args.length > 1
       raise Slop::Error, "#{recipe} not found" if !File.exist?(recipe)
 
       slop.to_h.tap do

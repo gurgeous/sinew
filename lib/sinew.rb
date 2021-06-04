@@ -1,14 +1,17 @@
 # sinew
-require_relative 'sinew/args'
-require_relative 'sinew/base'
-require_relative 'sinew/csv'
-require_relative 'sinew/main'
-require_relative 'sinew/nokogiri_ext'
-require_relative 'sinew/response'
-require_relative 'sinew/version'
+require 'sinew/args'
+require 'sinew/base'
+require 'sinew/csv'
+require 'sinew/main'
+require 'sinew/nokogiri_ext'
+require 'sinew/response'
+require 'sinew/version'
 
-# middleware
-require_relative 'sinew/middleware/log_formatter'
+# for slop
+require 'sinew/slop_duration'
+
+# custom faraday middleware
+require 'sinew/middleware/log_formatter'
 
 module Sinew
   # flow control for --limit

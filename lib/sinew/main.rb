@@ -25,12 +25,11 @@ module Sinew
     def load_recipe
       # does it exist?
       path = options[:recipe]
-      raise CliError, "#{path.inspect} file not found" if !File.exist?(path)
 
       # load file
       require(File.expand_path(path))
       klass = IO.read(path)[/class ([A-Z][A-Za-z0-9_]*)\s*<\s*Sinew::Base/, 1]
-      raise CliError, "could not find a Sinew subclass in #{path.inspect}" if !klass
+      raise "could not find a Sinew subclass in #{path.inspect}" if !klass
 
       # instantiate
       Object.const_get(klass).new(options)

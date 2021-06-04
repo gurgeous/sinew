@@ -6,7 +6,7 @@ require 'httpdisk'
 
 module Sinew
   class Base
-    # these have a sinew_xxx prefix to avoid collisions
+    # these use a sinew_xxx prefix to avoid collisions
     attr_reader :sinew_csv, :sinew_mutex, :sinew_options
 
     def initialize(options = {})
@@ -59,6 +59,12 @@ module Sinew
         _1.options[:proxy] = random_proxy
       end
       Response.new(faraday_response)
+    end
+
+    def post_json(url, body = nil, headers = nil)
+      body = body.to_json
+      headers = (headers || {}).merge("Content-Type" => 'application/json')
+      post(url, body, headers)
     end
 
     def faraday
