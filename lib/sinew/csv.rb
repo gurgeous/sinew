@@ -57,7 +57,10 @@ module Sinew
       print
     end
 
-    ASCII_ONLY = /\A[#{Regexp.escape((33..126).map(&:chr).join)}\s]+\Z/.freeze
+    ASCII_ONLY = begin
+      chars = (33..126).map(&:chr) - ['&']
+      /\A[#{Regexp.escape(chars.join)}\s]+\Z/
+    end.freeze
 
     def normalize(s)
       # nokogiri/array/misc => string
