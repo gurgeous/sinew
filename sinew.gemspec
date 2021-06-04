@@ -24,9 +24,9 @@ Gem::Specification.new do |s|
 
   # gem dependencies
   s.add_dependency 'amazing_print', '~> 1.3'
+  s.add_dependency 'faraday', '~> 1.4'
   s.add_dependency 'faraday-encoding', '~> 0'
   s.add_dependency 'faraday-rate_limiter', '~> 0.0'
-  s.add_dependency 'faraday', '~> 1.4'
   s.add_dependency 'httpdisk', '~> 0'
   s.add_dependency 'nokogiri', '~> 1.11'
   s.add_dependency 'slop', '~> 4.8'

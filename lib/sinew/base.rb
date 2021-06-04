@@ -63,7 +63,7 @@ module Sinew
 
     def post_json(url, body = nil, headers = nil)
       body = body.to_json
-      headers = (headers || {}).merge("Content-Type" => 'application/json')
+      headers = (headers || {}).merge('Content-Type' => 'application/json')
       post(url, body, headers)
     end
 
