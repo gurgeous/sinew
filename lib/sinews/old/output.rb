@@ -6,7 +6,7 @@ require 'sterile'
 # CSV output.
 #
 
-module Sinew
+module Sinews
   class Output
     attr_reader :sinew, :columns, :rows, :urls, :csv
 
@@ -97,7 +97,7 @@ module Sinew
             s.map(&:to_s).join('|')
           else
             s.to_s
-          end
+      end
 
       # strip html tags. Note that we replace tags with spaces
       s = s.gsub(/<[^>]+>/, ' ')
@@ -112,9 +112,7 @@ module Sinew
       s = Sterile.transliterate(s)
 
       # squish
-      s = s.squish
-
-      s
+      s.squish
     end
     protected :normalize
 

@@ -7,7 +7,6 @@ PATH
       faraday-encoding (~> 0)
       httpdisk (~> 0)
       nokogiri (~> 1.11)
-      scripto (~> 0)
       slop (~> 4.8)
       sterile (~> 1.0)
 
@@ -77,7 +76,6 @@ GEM
       parser (>= 3.0.1.1)
     ruby-progressbar (1.11.0)
     ruby2_keywords (0.0.4)
-    scripto (0.0.4)
     slop (4.9.1)
     sterile (1.0.22)
       nokogiri (>= 1.11.0)

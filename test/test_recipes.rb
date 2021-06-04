@@ -13,7 +13,7 @@ class TestRecipe < MiniTest::Test
 
         # get ready
         IO.write(test_sinew, recipe)
-        sinew = Sinew::Main.new(cache: @tmpdir, quiet: true, recipe: test_sinew)
+        sinew = Sinews::Main.new(dir: @tmpdir, quiet: true, recipe: test_sinew)
 
         # read OPTIONS
         if options = options_from(recipe)

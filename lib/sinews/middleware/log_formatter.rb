@@ -1,5 +1,5 @@
-module Sinew
-  module Connection
+module Sinews
+  module Middleware
     class LogFormatter < Faraday::Logging::Formatter
       def request(env)
         info('req') do

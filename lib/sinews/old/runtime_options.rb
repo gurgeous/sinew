@@ -2,19 +2,15 @@
 # Runtime options that sinew files can modify.
 #
 
-module Sinew
+module Sinews
   class RuntimeOptions
-    attr_accessor :retries
-    attr_accessor :rate_limit
-    attr_accessor :headers
-    attr_accessor :httpdisk_options
-    attr_accessor :insecure
+    attr_accessor :retries, :rate_limit, :headers, :httpdisk_options, :insecure
 
     def initialize
       self.retries = 3
       self.rate_limit = 1
       self.headers = {
-        'User-Agent' => "sinew/#{VERSION}"
+        'User-Agent' => "sinew/#{VERSION}",
       }
       self.httpdisk_options = {}
       self.insecure = false

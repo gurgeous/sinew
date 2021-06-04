@@ -2,10 +2,10 @@ require 'faraday'
 require 'faraday-encoding'
 require 'faraday/logging/formatter'
 require 'httpdisk'
-require 'sinew/connection/log_formatter'
-require 'sinew/connection/rate_limit'
+require 'sinews/connection/log_formatter'
+require 'sinews/connection/rate_limit'
 
-module Sinew
+module Sinews
   module Connection
     def self.create(options:, runtime_options:)
       connection_options = {}
@@ -26,9 +26,9 @@ module Sinew
 
         # disk caching
         httpdisk_options = {
-          dir: options[:cache],
+          dir: options[:dir],
           force: options[:force],
-          force_errors: options[:force_errors]
+          force_errors: options[:force_errors],
         }.merge(runtime_options.httpdisk_options)
 
         _1.use :httpdisk, httpdisk_options
@@ -43,7 +43,7 @@ module Sinew
           max: runtime_options.retries,
           methods: %w[delete get head options patch post put trace],
           retry_statuses: (500..600).to_a,
-          retry_if: ->(_env, _err) { true }
+          retry_if: ->(_env, _err) { true },
         }
         _1.request :retry, retry_options
       end

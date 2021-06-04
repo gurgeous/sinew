@@ -53,7 +53,7 @@ class TestRequests < MiniTest::Test
     errors = [
       Errno::ECONNREFUSED,
       OpenSSL::SSL::SSLError.new,
-      SocketError.new
+      SocketError.new,
     ]
     errors.each_with_index do |error, index|
       stub_request(:get, %r{http://[^/]+/error#{index}}).to_return { raise error }
@@ -98,19 +98,19 @@ class TestRequests < MiniTest::Test
 
   def test_urls
     # simple
-    req = Sinew::Request.new('get', 'https://host')
+    req = Sinews::Request.new('get', 'https://host')
     assert_equal 'https://host', req.uri.to_s
 
     # with query
-    req = Sinew::Request.new('get', 'https://host', query: { a: 1 })
+    req = Sinews::Request.new('get', 'https://host', query: { a: 1 })
     assert_equal 'https://host?a=1', req.uri.to_s
 
     # entity decoding
-    req = Sinew::Request.new('get', 'https://host?a=&lt;5')
+    req = Sinews::Request.new('get', 'https://host?a=&lt;5')
     assert_equal 'https://host?a=%3C5', req.uri.to_s
 
     # sloppy urls
-    req = Sinew::Request.new('get', 'https://host?a=b c&d=f\'g')
+    req = Sinews::Request.new('get', 'https://host?a=b c&d=f\'g')
     assert_equal 'https://host?a=b%20c&d=f%27g', req.uri.to_s
   end
 end

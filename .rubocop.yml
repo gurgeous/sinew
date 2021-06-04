@@ -3,30 +3,29 @@ AllCops:
   SuggestExtensions: false
   TargetRubyVersion: 2.7
 
-# amd: these seem extreme
+# this is buggy in 2.7.0
+Style/HashTransformValues: { Enabled: false }
+
+# minimal personal preference
+Layout/CaseIndentation: { Enabled: false }
+Layout/EndAlignment: { EnforcedStyleAlignWith: variable }
 Lint/AssignmentInCondition: { Enabled: false }
-Lint/SuppressedException: { Enabled: false }
+Lint/NonLocalExitFromIterator: { Enabled: false }
 Metrics: { Enabled: false }
-Naming/BinaryOperatorParameterName: { Enabled: false }
 Naming/HeredocDelimiterNaming: { Enabled: false }
 Naming/MethodParameterName: { Enabled: false }
-Style/AccessorGrouping: { Enabled: false }
+Naming/VariableNumber: { Enabled: false }
 Style/AsciiComments: { Enabled: false }
-Style/ClassAndModuleChildren: { Enabled: false }
 Style/Documentation: { Enabled: false }
 Style/DoubleNegation: { Enabled: false }
+Style/EmptyCaseCondition: { Enabled: false }
 Style/FormatStringToken: { Enabled: false }
 Style/FrozenStringLiteralComment: { Enabled: false }
 Style/GuardClause: { Enabled: false }
-Style/HashTransformValues: { Enabled: false }
 Style/IfUnlessModifier: { Enabled: false }
 Style/NegatedIf: { Enabled: false }
-Style/Next: { Enabled: false }
 Style/NumericPredicate: { Enabled: false }
 Style/ParallelAssignment: { Enabled: false }
-Style/PerlBackrefs: { Enabled: false }
-Style/RaiseArgs: { Enabled: false }
-Style/RedundantAssignment: { Enabled: false }
-Style/RegexpLiteral: { Enabled: false }
-Style/SoleNestedConditional: { Enabled: false }
 Style/StderrPuts: { Enabled: false }
+Style/TrailingCommaInArrayLiteral: { EnforcedStyleForMultiline: consistent_comma }
+Style/TrailingCommaInHashLiteral: { EnforcedStyleForMultiline: consistent_comma }

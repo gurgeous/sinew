@@ -4,7 +4,7 @@ require 'sterile'
 # Process a single HTTP request.
 #
 
-module Sinew
+module Sinews
   class Error < StandardError; end
 
   class Request

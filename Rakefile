@@ -1,7 +1,7 @@
 require 'bundler/setup'
 
 require 'rake/testtask'
-require 'sinew/version'
+require 'sinews/version'
 
 # load the spec, we use it below
 spec = Gem::Specification.load('sinew.gemspec')

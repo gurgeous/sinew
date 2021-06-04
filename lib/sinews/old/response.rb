@@ -5,7 +5,7 @@ require 'zlib'
 # An HTTP response.
 #
 
-module Sinew
+module Sinews
   class Response
     attr_accessor :request, :uri, :body, :code, :headers
 
@@ -34,12 +34,8 @@ module Sinew
       end
 
       # force to utf-8 if we think this could be text
-      if body.encoding != Encoding::UTF_8
-        if content_type = response.headers['content-type']
-          if content_type =~ /\b(html|javascript|json|text|xml)\b/
-            body = body.encode('UTF-8', invalid: :replace, undef: :replace, replace: '?')
-          end
-        end
+      if body.encoding != Encoding::UTF_8 && content_type = response.headers['content-type'] && (content_type =~ /\b(html|javascript|json|text|xml)\b/)
+        body = body.encode('UTF-8', invalid: :replace, undef: :replace, replace: '?')
       end
 
       body
@@ -65,7 +61,7 @@ module Sinew
       {
         uri: uri,
         code: code,
-        headers: headers
+        headers: headers,
       }
     end
   end
