@@ -1,7 +1,3 @@
+.ruby-version
 *.gem
-.bundle
-Gemfile.lock
-pkg/*
-rdoc
 sample.csv
-TAGS

@@ -1,0 +1,105 @@
+PATH
+  remote: .
+  specs:
+    sinew (3.0.1)
+      amazing_print (~> 1.3)
+      faraday (~> 1.4)
+      faraday-encoding (~> 0)
+      httpdisk (~> 0)
+      nokogiri (~> 1.11)
+      scripto (~> 0)
+      slop (~> 4.8)
+      sterile (~> 1.0)
+
+GEM
+  remote: http://rubygems.org/
+  specs:
+    addressable (2.7.0)
+      public_suffix (>= 2.0.2, < 5.0)
+    amazing_print (1.3.0)
+    ast (2.4.2)
+    crack (0.4.5)
+      rexml
+    domain_name (0.5.20190701)
+      unf (>= 0.0.5, < 1.0.0)
+    faraday (1.4.2)
+      faraday-em_http (~> 1.0)
+      faraday-em_synchrony (~> 1.0)
+      faraday-excon (~> 1.1)
+      faraday-net_http (~> 1.0)
+      faraday-net_http_persistent (~> 1.1)
+      multipart-post (>= 1.2, < 3)
+      ruby2_keywords (>= 0.0.4)
+    faraday-cookie_jar (0.0.7)
+      faraday (>= 0.8.0)
+      http-cookie (~> 1.0.0)
+    faraday-em_http (1.0.0)
+    faraday-em_synchrony (1.0.0)
+    faraday-encoding (0.0.5)
+      faraday
+    faraday-excon (1.1.0)
+    faraday-net_http (1.0.1)
+    faraday-net_http_persistent (1.1.0)
+    faraday_middleware (1.0.0)
+      faraday (~> 1.0)
+    hashdiff (1.0.1)
+    http-cookie (1.0.3)
+      domain_name (~> 0.5)
+    httpdisk (0.4.0)
+      faraday (~> 1.4)
+      faraday-cookie_jar (~> 0.0)
+      faraday_middleware (~> 1.0)
+      slop (~> 4.8)
+    minitest (5.14.4)
+    mocha (1.12.0)
+    multipart-post (2.1.1)
+    nokogiri (1.11.6-x86_64-darwin)
+      racc (~> 1.4)
+    parallel (1.20.1)
+    parser (3.0.1.1)
+      ast (~> 2.4.1)
+    public_suffix (4.0.6)
+    racc (1.5.2)
+    rainbow (3.0.0)
+    rake (13.0.3)
+    regexp_parser (2.1.1)
+    rexml (3.2.5)
+    rubocop (0.91.1)
+      parallel (~> 1.10)
+      parser (>= 2.7.1.1)
+      rainbow (>= 2.2.2, < 4.0)
+      regexp_parser (>= 1.7)
+      rexml
+      rubocop-ast (>= 0.4.0, < 1.0)
+      ruby-progressbar (~> 1.7)
+      unicode-display_width (>= 1.4.0, < 2.0)
+    rubocop-ast (0.8.0)
+      parser (>= 2.7.1.5)
+    ruby-progressbar (1.11.0)
+    ruby2_keywords (0.0.4)
+    scripto (0.0.4)
+    slop (4.9.1)
+    sterile (1.0.22)
+      nokogiri (>= 1.11.0)
+    unf (0.1.4)
+      unf_ext
+    unf_ext (0.0.7.7)
+    unicode-display_width (1.7.0)
+    webmock (3.12.2)
+      addressable (>= 2.3.6)
+      crack (>= 0.3.2)
+      hashdiff (>= 0.4.0, < 2.0.0)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  minitest
+  mocha
+  rake
+  rubocop (~> 0.91.0)
+  sinew!
+  webmock
+
+BUNDLED WITH
+   2.1.4

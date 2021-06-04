@@ -1,3 +1,4 @@
+require_relative 'sinew/args'
 require_relative 'sinew/core_ext'
 require_relative 'sinew/dsl'
 require_relative 'sinew/main'
