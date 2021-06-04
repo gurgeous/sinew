@@ -2,18 +2,30 @@
 require 'sinew/version'
 require 'slop'
 
+#
+# This is used to parse command line arguments with Slop. We don't set any
+# defaults in here, relying instead on Sloptions in Sinew::Base. That way
+# defaults are applied for both command line and embedded usage of Sinew::Base.
+#
+
 module Sinew
   module Args
     def self.slop(args)
       slop = Slop.parse(args) do |o|
         o.banner = 'Usage: sinew [options] [recipe]'
-        o.bool '-v', '--verbose', 'dump emitted rows while running'
-        o.bool '-s', '--silent', 'suppress some output'
         o.integer '-l', '--limit', 'quit after emitting this many rows'
-        o.string '--dir', 'set custom cache directory', default: "#{ENV['HOME']}/.sinew"
+        o.integer '-m', '--max-time', 'maximum time allowed for the transfer'
+        o.string '--proxy', 'use host[:port] as HTTP proxy (can be a comma-delimited list)'
+        o.bool '-s', '--silent', 'suppress some output'
+        o.bool '-v', '--verbose', 'dump emitted rows while running'
+
+        o.separator 'From httpdisk:'
+        o.string '--dir', 'set custom cache directory'
+        o.string '--expires', 'when to expire cached requests (ex: 1h, 2d, 3w)'
         o.bool '--force', "don't read anything from cache (but still write)"
         o.bool '--force-errors', "don't read errors from cache (but still write)"
-        o.string '--proxy', 'use host[:port] as HTTP proxy (can be a comma-delimited list)'
+
+        # generic
         o.boolean '--version', 'show version' do
           puts "sinew #{Sinew::VERSION}"
           exit

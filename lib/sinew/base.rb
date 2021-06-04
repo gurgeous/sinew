@@ -12,33 +12,31 @@ module Sinew
     def initialize(options = {})
       @sinew_csv = CSV.new(options[:recipe] || method(:run).source_location.first)
       @sinew_mutex = Mutex.new
-      @sinew_options = HTTPDisk::Sloptions.parse(options) do
-        # sinew
-        _1.integer :limit # cli
-        _1.boolean :silent # cli
-        _1.boolean :verbose # cli
 
-        # faraday
+      # borrow HTTPDisk::Sloptions for parsing options
+      @sinew_options = HTTPDisk::Sloptions.parse(options) do
+        # cli
+        _1.integer :limit
+        _1.integer :max_time, default: 30
+        _1.boolean :silent
+        _1.on :proxy, type: [:string, Array]
+        _1.boolean :verbose
+
+        # httpdisk
+        _1.string :dir, default: File.join(ENV['HOME'], '.sinew')
+        _1.integer :expires
+        _1.boolean :force
+        _1.boolean :force_errors
+        _1.array :ignore_params
+
+        # more handy options
         _1.hash :headers
         _1.boolean :insecure
         _1.hash :params
-        _1.on :proxy, type: [:string, Array] # cli
-        _1.integer :timeout, default: 30
-        _1.on :url_prefix, type: [:string, URI]
-
-        # middleware
         _1.integer :rate_limit, default: 1
         _1.integer :retries, default: 2
-
-        # httpdisk
-        _1.string :dir # cli
-        _1.integer :expires # cli
-        _1.boolean :force # cli
-        _1.boolean :force_errors # cli
-        _1.array :ignore_params
+        _1.on :url_prefix, type: [:string, URI]
       end
-
-      sinew_options[:proxy] = sinew_options[:proxy].split(',') if sinew_options[:proxy].is_a?(String)
     end
 
     def run
@@ -148,7 +146,11 @@ module Sinew
     protected
 
     def random_proxy
-      sinew_options[:proxy]&.sample
+      return if !sinew_options[:proxy]
+
+      proxies = sinew_options[:proxy]
+      proxies = proxies.split(',') if !proxies.is_a?(Array)
+      proxies.sample
     end
 
     def create_faraday

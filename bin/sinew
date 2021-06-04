@@ -2,18 +2,6 @@
 
 $LOAD_PATH.unshift(File.join(__dir__, '../lib'))
 
-#
-# move old classes aside, start on:
-#
-# args
-# base (superclass)
-# main
-# middleware/log_formatter (use rate limiting gem)
-# nokogiri_ext
-# csv (used to be called output)
-# response
-#
-
 BIN = File.basename($PROGRAM_NAME)
 
 #
