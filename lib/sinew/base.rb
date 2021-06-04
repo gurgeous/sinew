@@ -13,6 +13,8 @@ module Sinew
       @sinew_csv = CSV.new(options[:recipe] || method(:run).source_location.first)
       @sinew_mutex = Mutex.new
 
+      default_rate_limit = ENV['SINEW_TEST'] ? 0 : 1
+
       # borrow HTTPDisk::Sloptions for parsing options
       @sinew_options = HTTPDisk::Sloptions.parse(options) do
         # cli
@@ -33,7 +35,7 @@ module Sinew
         _1.hash :headers
         _1.boolean :insecure
         _1.hash :params
-        _1.integer :rate_limit, default: 1
+        _1.integer :rate_limit, default: default_rate_limit
         _1.integer :retries, default: 2
         _1.on :url_prefix, type: [:string, URI]
       end

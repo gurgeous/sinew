@@ -1,8 +1,0 @@
-get 'http://httpbingo.org/html'
-raw.scan(/<h1>([^<]+)/) do
-  csv_emit(h1: $1)
-end
-
-# OUTPUT
-# h1
-# Herman Melville - Moby-Dick
