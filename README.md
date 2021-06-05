@@ -2,17 +2,22 @@
 
 ## Welcome to Sinew
 
-Sinew collects structured data from web sites (screen scraping). It provides a Ruby DSL built for crawling, a robust caching system, and integration with [Nokogiri](http://nokogiri.org). Though small, this project is the culmination of years of effort based on crawling systems built at several different companies.
+Sinew is a Ruby library for collecting data from web sites (scraping). Though small, this project is the culmination of years of effort based on crawling systems built at several different companies.
 
-Sinew is distributed as a ruby gem:
+## Key Features
 
-```sh
-$ gem install sinew
-```
+- Robust crawling with the [Faraday](https://lostisland.github.io/faraday/) HTTP client
+- Aggressive caching with [httpdisk](https://github.com/gurgeous/httpdisk/)
+- Easy parsing with HTML cleanup, Nokogiri, JSON, etc.
+- CSV generation for crawled data
 
-or in your Gemfile:
+## Installation
 
 ```ruby
+# install gem
+$ gem install sinew
+
+# or add to your Gemfile:
 gem 'sinew'
 ```
 
@@ -20,39 +25,45 @@ gem 'sinew'
 
 <!--- markdown-toc --no-firsth1 --maxdepth 1 readme.md -->
 
-- [Sinew 3](#sinew-3-may-2021)
+- [Sinew 4](#sinew-4-june-2021)
 - [Quick Example](#quick-example)
 - [How it Works](#how-it-works)
-- [DSL Reference](#dsl-reference)
+- [Reference](#dsreference)
 - [Hints](#hints)
 - [Limitations](#limitations)
 - [Changelog](#changelog)
 - [License](#license)
 
-## Sinew 3 (May 2021)
-
-I am pleased to announce the release of Sinew 3.0. Sinew has been streamlined and updated to use the [Faraday](https://lostisland.github.io/faraday/) HTTP client with [sinew](https://github.com/gurgeous/sinew/) middleware for caching.
+## Sinew 4 (June 2021)
 
 **Breaking change**
 
-Sinew 3 uses a new format for cached responses. Old Sinew 2 cache directories should be removed before running Sinew again.
+We are pleased to announce the release of Sinew 4. Sinew 4 uses a `Sinew::Base` class instead of `.sinew` files. This makes it possible to use Sinew from the command line or embedded in another application. Also, Sinew 4 uses Response objects instead of relying on a DSL to faciliate parallelism.
+
+Sinew uses the [Faraday](https://lostisland.github.io/faraday/) HTTP client with the [httpdisk](https://github.com/gurgeous/httpdisk/) middleware for aggressive caching of responses.
 
 ## Quick Example
 
-Here's an example for collecting the links from httpbingo.org. Paste this into a file called `sample.sinew` and run `sinew sample.sinew`. It will create a `sample.csv` file containing the href and text for each link:
+Here's an example for collecting the links from httpbingo.org. Paste this into a file called `sample.rb` and run `sinew sample.rb`. It will create a `sample.csv` file containing the href and text for each link:
 
 ```ruby
-# get the url
-get "http://httpbingo.org"
+# run with:
+# $ sinew links.rb
+class Links < Sinew::Base
+  def run
+    # get the url
+    response = get "https://httpbingo.org"
 
-# use nokogiri to collect links
-noko.css("ul li a").each do |a|
-  row = { }
-  row[:url] = a[:href]
-  row[:title] = a.text
+    # use nokogiri to collect links
+    response.noko.css("ul li a").each do |a|
+      row = { }
+      row[:url] = a[:href]
+      row[:title] = a.text
 
-  # append a row to the csv
-  csv_emit(row)
+      # append a row to the csv
+      csv_emit(row)
+    end
+  end
 end
 ```
 
@@ -60,27 +71,43 @@ end
 
 There are three main features provided by Sinew.
 
-#### The Sinew DSL
+#### Recipes
 
-Sinew uses recipe files to crawl web sites. Recipes have the `.sinew` extension, but they are plain old Ruby. The [Sinew DSL](#dsl) makes crawling easy. Use `get` to make an HTTP GET:
+Sinew uses recipe files to crawl web sites. Each recipe is a subclass of
+`Sinew::Base`. Use the `sinew` command to load and run a recipe. Here's a
+trivial example that calls `get` to make an HTTP GET request:
 
 ```ruby
-get "https://www.google.com/search?q=darwin"
-get "https://www.google.com/search", q: "charles darwin"
+# run with:
+# $ sinew google.rb
+class Google < Sinew::Base
+  def run
+    response = get "https://www.google.com/search?q=darwin"
+    response = get "https://www.google.com/search", q: "charles darwin"
+  end
+end
 ```
 
-Once you've done a `get`, you have access to the document in a few different formats. In general, it's easiest to use `noko` to automatically parse and interact with the results. If Nokogiri isn't appropriate, you can fall back to regular expressions run against `raw` or `html`. Use `json` if you are expecting a JSON response.
+Once you've done a `get`, you can access the document in a few different
+formats. In general, it's easiest to use `noko` to automatically parse and
+interact with HTML results. If Nokogiri isn't appropriate, fall back to regular expressions run against `body` or `html`. Use `json` if you are expecting a JSON response.
 
 ```ruby
-get "https://www.google.com/search?q=darwin"
+# run with:
+# $ sinew links2.rb
+class Links2 < Sinew::Base
+  def run
+    response = get "https://www.google.com/search?q=darwin"
 
-# pull out the links with nokogiri
-links = noko.css("a").map { |i| i[:href] }
-puts links.inspect
+    # pull out the links with nokogiri
+    links = response.noko.css("a").map { _1[:href] }
+    puts links.inspect
 
-# or, use a regex
-links = html[/<a[^>]+href="([^"]+)/, 1]
-puts links.inspect
+    # or, use a regex
+    links = response.html[/<a[^>]+href="([^"]+)/, 1]
+    puts links.inspect
+  end
+end
 ```
 
 #### CSV Output
@@ -88,16 +115,22 @@ puts links.inspect
 Recipes output CSV files. To continue the example above:
 
 ```ruby
-get "https://www.google.com/search?q=darwin"
-noko.css("a").each do |i|
-  row = { }
-  row[:href] = i[:href]
-  row[:text] = i.text
-  csv_emit row
+# run with:
+# $ sinew serps.rb
+class Serps < Sinew::Base
+  def run
+    response = get "https://www.google.com/search?q=darwin"
+    response.noko.css("a").each do |i|
+      row = { }
+      row[:href] = i[:href]
+      row[:text] = i.text
+      csv_emit row
+    end
+  end
 end
 ```
 
-Sinew creates a CSV file with the same name as the recipe, and `csv_emit(hash)` appends a row. The values of your hash are converted to strings:
+Sinew creates a CSV file with the same name as the recipe, and `csv_emit(hash)` appends a row. The values of your hash are cleaned up and converted to strings:
 
 1.  Nokogiri nodes are converted to text
 1.  Arrays are joined with "|", so you can separate them later
@@ -108,34 +141,79 @@ Sinew creates a CSV file with the same name as the recipe, and `csv_emit(hash)` 
 
 Sinew uses [httpdisk](https://github.com/gurgeous/httpdisk/) to aggressively cache all HTTP responses to disk in `~/.sinew`. Error responses are cached as well. Each URL will be hit exactly once, and requests are rate limited to one per second. Sinew tries to be polite.
 
-Sinew never deletes files from the cache - that's up to you!
+Sinew never deletes files from the cache - that's up to you! Sinew has various command line options to refresh the cache. See `--expires`, `--force` and `--force-errors`.
 
-Because all requests are cached, you can run Sinew repeatedly with confidence. Run it over and over again while you build up your recipe.
+Because all requests are cached, you can run Sinew repeatedly with confidence. Run it over and over again while you work on your recipe.
 
-## DSL Reference
+## Running Sinew
 
-#### Making requests
+The `sinew` command line has many useful options. You will be using this command many times as you iterate on your recipe:
 
-- `get(url, query = {})` - fetch a url with HTTP GET. URL parameters can be added using `query.
-- `post(url, form = {})` - fetch a url with HTTP POST, using `form` as the URL encoded POST body.
-- `post_json(url, json = {})` - fetch a url with HTTP POST, using `json` as the POST body.
-- `http(method, url, options = {})` - use this for more complex requests
+```sh
+$ bin/sinew --help
+Usage: sinew [options] [recipe]
+    -l, --limit     quit after emitting this many rows
+    --proxy         use host[:port] as HTTP proxy
+    --timeout       maximum time allowed for the transfer
+    -s, --silent    suppress some output
+    -v, --verbose   dump emitted rows while running
+From httpdisk:
+    --dir           set custom cache directory
+    --expires       when to expire cached requests (ex: 1h, 2d, 3w)
+    --force         don't read anything from cache (but still write)
+    --force-errors  don't read errors from cache (but still write)
+```
+
+`Sinew::Base` also has many runtime options that can be set by overriding the initializer in your recipe. For example:
+
+```ruby
+# run with:
+# $ sinew my_user_agent.rb
+class MyUserAgent < Sinew::Base
+  def initialize(options)
+    options[:headers] = { 'User-Agent' => 'xyz' }
+    super(options)
+  end
+
+  def run
+    # ...
+  end
+end
+```
+
+Here is the list of available options for `Sinew::Base`:
+
+- **headers** - default HTTP headers to use on every request
+- **ignore_params** - ignore these query params when generating httpdisk cache keys
+- **insecure** - ignore SSL errors
+- **params** - default query parameters to use on every request
+- **rate_limit** - minimum time between network requests
+- **retries** - number of times to retry each failed request
+- **url_prefix** - deafult URL base to use on every request
+
+## Reference
+
+#### Making HTTP requests
+
+- `get(url, params = nil, headers = nil)` - fetch a url with GET
+- `post(url, body = nil, headers = nil)` - fetch a url with POST, using `form` as the URL encoded POST body.
+- `post_json(url, body = nil, headers = nil)` - fetch a url with POST, using `json` as the POST body.
 
 #### Parsing the response
 
-These variables are set after each HTTP request.
+Each request method returns a `Sinew::Response`. The response has several helpers to make parsing easier:
 
-- `raw` - the raw response from the last request
-- `html` - like `raw`, but with a handful of HTML-specific whitespace cleanups
-- `noko` - parse the response as HTML and return a [Nokogiri](http://nokogiri.org) document
-- `xml` - parse the response as XML and return a [Nokogiri](http://nokogiri.org) document
-- `json` - parse the response as JSON, with symbolized keys
-- `url` - the url of the last request. If the request goes through a redirect, `url` will reflect the final url.
-- `uri` - the URI of the last request. This is useful for resolving relative URLs.
+- `body` - the raw body
+- `html` - like `body`, but with a handful of HTML-specific whitespace cleanups
+- `noko` - parse as HTML and return a [Nokogiri](http://nokogiri.org) document
+- `xml` - parse as XML and return a [Nokogiri](http://nokogiri.org) document
+- `json` - parse as JSON, with symbolized keys
+- `mash` - parse as JSON and return a [Hashie::Mash](https://github.com/hashie/hashie#mash)
+- `url` - the url of the request. If the request goes through a redirect, `url` will reflect the final url.
 
 #### Writing CSV
 
-- `csv_header(keys)` - specify the columns for CSV output. If you don't call this, Sinew will use the keys from the first call to `csv_emit`.
+- `csv_header(columns)` - specify the columns for CSV output. If you don't call this, Sinew will use the keys from the first call to `csv_emit`.
 - `csv_emit(hash)` - append a row to the CSV file
 
 ## Hints
@@ -145,13 +223,15 @@ Writing Sinew recipes is fun and easy. The builtin caching means you can iterate
 - Sinew doesn't (yet) check robots.txt - please check it manually.
 - Prefer Nokogiri over regular expressions wherever possible. Learn [CSS selectors](http://www.w3schools.com/cssref/css_selectors.asp).
 - In Chrome, `$` in the console is your friend.
-- Fallback to regular expressions if you're desperate. Depending on the site, use either `raw` or `html`. `html` is probably your best bet. `raw` is good for crawling Javascript, but it's fragile if the site changes.
+- Fallback to regular expressions if you're desperate. Depending on the site, use either `body` or `html`. `html` is probably your best bet. `body` is good for crawling Javascript, but it's fragile if the site changes.
 - Learn to love `String#[regexp]`, which is an obscure operator but incredibly handy for Sinew.
 - Laziness is useful. Keep your CSS selectors and regular expressions simple, so maybe they'll work again the next time you need to crawl a site.
 - Don't be afraid to mix CSS selectors, regular expressions, and Ruby:
 
 ```ruby
-noko.css("table")[4].css("td").select { |i| i[:width].to_i > 80 }.map(&:text)
+noko.css("table")[4].css("td").select do
+  _1[:width].to_i > 80
+end.map(&:text)
 ```
 
 - Debug your recipes using plain old `puts`, or better yet use `ap` from [amazing_print](https://github.com/amazing-print/amazing_print).
@@ -164,6 +244,10 @@ noko.css("table")[4].css("td").select { |i| i[:width].to_i > 80 }.map(&:text)
 - Almost no support for international (non-english) characters
 
 ## Changelog
+
+#### 4.0.0 (unreleased)
+
+- Rewritten to use Sinew::Base
 
 #### 3.0.0 (May 2021)
 
