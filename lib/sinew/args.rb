@@ -22,6 +22,7 @@ module Sinew
 
         o.separator 'From httpdisk:'
         o.string '--dir', 'set custom cache directory'
+        # note: uses slop_duration from HTTPDisk
         o.duration '--expires', 'when to expire cached requests (ex: 1h, 2d, 3w)'
         o.bool '--force', "don't read anything from cache (but still write)"
         o.bool '--force-errors', "don't read errors from cache (but still write)"

@@ -16,6 +16,7 @@ Naming/HeredocDelimiterNaming: { Enabled: false }
 Naming/MethodParameterName: { Enabled: false }
 Naming/VariableNumber: { Enabled: false }
 Style/AsciiComments: { Enabled: false }
+Style/CommentAnnotation: { Enabled: false }
 Style/Documentation: { Enabled: false }
 Style/DoubleNegation: { Enabled: false }
 Style/EmptyCaseCondition: { Enabled: false }
@@ -27,5 +28,6 @@ Style/NegatedIf: { Enabled: false }
 Style/NumericPredicate: { Enabled: false }
 Style/ParallelAssignment: { Enabled: false }
 Style/StderrPuts: { Enabled: false }
+Style/StringConcatenation: { Enabled: false }
 Style/TrailingCommaInArrayLiteral: { EnforcedStyleForMultiline: consistent_comma }
 Style/TrailingCommaInHashLiteral: { EnforcedStyleForMultiline: consistent_comma }

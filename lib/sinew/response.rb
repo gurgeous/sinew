@@ -2,7 +2,6 @@ require 'delegate'
 require 'hashie/mash'
 require 'json'
 require 'nokogiri'
-require 'sterile'
 
 module Sinew
   class Response < SimpleDelegator

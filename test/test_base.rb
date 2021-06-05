@@ -13,7 +13,7 @@ class TestBase < MiniTest::Test
   def test_options_expires
     base = base(expires: 123)
     2.times { base.get('http://host') }
-    path = Dir["#{File.join(@tmpdir, 'host')}/*/*"]
+    path = Dir[File.join(@tmpdir, 'host', '*', '*')]
     FileUtils.touch(path, mtime: Time.now - 999)
     base.get('http://host') # stale
     assert_requested :get, 'host', times: 2
@@ -34,15 +34,15 @@ class TestBase < MiniTest::Test
   end
 
   def test_options_default_request
-    base = base(headers: { a: '1' }, params: { b: 2 }, url_prefix: 'http://host')
+    base = base(params: { a: 1 }, headers: { b: '2' }, url_prefix: 'http://host')
     base.get('hello')
-    assert_requested :get, 'host/hello?b=2', headers: { a: '1' }
+    assert_requested :get, 'host/hello?a=1', headers: { b: '2' }
   end
 
   def test_options_proxy
     http = Net::HTTP.new('host')
     Net::HTTP.stubs(:new).returns(http).with('host', 80, 'boom', 123, nil, nil)
-    base(proxy: 'boom:123').get("http://host")
+    base(proxy: 'boom:123').get('http://host')
     assert_requested(:get, 'host', times: 1)
   end
 
@@ -71,7 +71,7 @@ class TestBase < MiniTest::Test
 
   def test_post
     base.post('http://host', { a: 1 }, { b: '2' })
-    assert_requested :post, 'host', body: "a=1", headers: { b: '2' }
+    assert_requested :post, 'host', body: 'a=1', headers: { b: '2' }
   end
 
   def test_post_json
@@ -80,7 +80,7 @@ class TestBase < MiniTest::Test
   end
 
   def test_csv
-    load recipe("csv_header(:a, :b) ; csv_emit(a: 1)")
+    load recipe('csv_header(:a, :b) ; csv_emit(a: 1)')
     recipe = Recipe.new
     recipe.run
     assert_equal("a,b\n1,\n", IO.read(recipe.sinew_csv.path))

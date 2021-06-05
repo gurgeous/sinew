@@ -25,7 +25,7 @@ module Sinew
       end
 
       #
-      # borrow HTTPDisk::Sloptions for parsing options
+      # note: use HTTPDisk::Sloptions
       #
 
       @sinew_options = HTTPDisk::Sloptions.parse(options) do
