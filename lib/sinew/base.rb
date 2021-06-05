@@ -10,12 +10,24 @@ module Sinew
     attr_reader :sinew_csv, :sinew_mutex, :sinew_options
 
     def initialize(options = {})
-      @sinew_csv = CSV.new(options[:recipe] || method(:run).source_location.first)
       @sinew_mutex = Mutex.new
 
-      default_rate_limit = ENV['SINEW_TEST'] ? 0 : 1
+      #
+      # some defaults for Sloptions
+      #
 
+      default_rate_limit = ENV['SINEW_TEST'] ? 0 : 1
+      default_output = begin
+        src = method(:run).source_location.first
+        dst = File.join(File.dirname(src), "#{File.basename(src, File.extname(src))}.csv")
+        dst = dst.sub(%r{^./}, '') # nice to clean this up
+        dst
+      end
+
+      #
       # borrow HTTPDisk::Sloptions for parsing options
+      #
+
       @sinew_options = HTTPDisk::Sloptions.parse(options) do
         # cli
         _1.integer :limit
@@ -34,11 +46,14 @@ module Sinew
         # more handy options
         _1.hash :headers
         _1.boolean :insecure
+        _1.string :output, default: default_output
         _1.hash :params
         _1.integer :rate_limit, default: default_rate_limit
         _1.integer :retries, default: 2
         _1.on :url_prefix, type: [:string, URI]
       end
+
+      @sinew_csv = CSV.new(sinew_options[:output])
     end
 
     def run
@@ -162,9 +177,15 @@ module Sinew
     end
 
     def create_faraday
-      faraday_options = sinew_options.slice(:headers, :params, :url_prefix)
-      faraday_options[:ssl] = { verify: false } if sinew_options[:insecure]
+      faraday_options = sinew_options.slice(:headers, :params)
+      if sinew_options[:insecure]
+        faraday_options[:ssl] = { verify: false }
+      end
       Faraday.new(nil, faraday_options) do
+        # options
+        if sinew_options[:url_prefix]
+          _1.url_prefix = sinew_options[:url_prefix]
+        end
         _1.options.timeout = sinew_options[:timeout]
 
         #

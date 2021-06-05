@@ -1,18 +1,8 @@
 require 'test_helper'
 
 class TestCsv < MiniTest::Test
-  def test_path
-    [
-      %w[gub.rb gub.csv],
-      %w[/zub/gub.rb /zub/gub.csv],
-      %w[../zub/gub.rb ../zub/gub.csv],
-    ].each do
-      assert_equal _2, Sinew::CSV.new(_1).path
-    end
-  end
-
   def test_emit
-    csv = Sinew::CSV.new("#{@tmpdir}/test.rb")
+    csv = Sinew::CSV.new(File.join(@tmpdir, 'test.csv'))
     csv.start(%i[a b])
     print = csv.emit(a: 1)
     assert_equal({ a: '1' }, print)

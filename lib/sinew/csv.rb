@@ -3,21 +3,11 @@ require 'sterile'
 
 module Sinew
   class CSV
-    attr_reader :columns, :count, :csv, :recipe_path, :tally
+    attr_reader :columns, :count, :csv, :path, :tally
 
-    def initialize(recipe_path)
+    def initialize(path)
       @count = 0
-      @recipe_path = recipe_path
-    end
-
-    # determine the csv path based on recipe_path
-    def path
-      @path ||= begin
-        src = recipe_path
-        dst = File.join(File.dirname(src), "#{File.basename(src, File.extname(src))}.csv")
-        dst = dst.sub(%r{^./}, '') # nice to clean this up
-        dst
-      end
+      @path = path
     end
 
     # start writing

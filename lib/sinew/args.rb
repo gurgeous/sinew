@@ -1,5 +1,5 @@
 # manually load dependencies here since this is loaded standalone by bin
-require 'sinew/slop_duration'
+require 'httpdisk/slop_duration'
 require 'sinew/version'
 require 'slop'
 

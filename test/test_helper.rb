@@ -1,8 +1,8 @@
 require 'English'
-require 'sinew'
 require 'minitest/autorun'
 require 'minitest/pride'
 require 'mocha/minitest'
+require 'sinew'
 require 'webmock/minitest'
 
 # a hint to sinew, so that it'll do things like set rate limit to zero
@@ -34,7 +34,7 @@ module MiniTest
         end
       EOF
 
-      "#{@tmpdir}/recipe.rb".tap do
+      File.join(@tmpdir, "recipe.rb").tap do
         IO.write(_1, code)
       end
     end
