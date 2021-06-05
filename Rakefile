@@ -23,6 +23,14 @@ task :watch do
 end
 
 #
+# pry
+#
+
+task :pry do
+  sh 'pry -I lib -r sinew.rb'
+end
+
+#
 # rubocop
 #
 

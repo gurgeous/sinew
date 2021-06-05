@@ -1,3 +1,5 @@
 .ruby-version
+.yardoc
 *.gem
+doc/
 sample.csv
