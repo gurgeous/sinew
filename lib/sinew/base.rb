@@ -5,18 +5,22 @@ require 'faraday-rate_limiter'
 require 'httpdisk'
 
 module Sinew
+  # Base class for Sinew recipes. Some effort was made to avoid naming
+  # collisions for subclasses.
   class Base
-    # these use a sinew_xxx prefix to avoid collisions
     attr_reader :sinew_csv, :sinew_mutex, :sinew_options
 
     def initialize(options = {})
       @sinew_mutex = Mutex.new
 
       #
-      # some defaults for Sloptions
+      # defaults for Sloptions
       #
 
+      # default :rate_limit, typically 1
       default_rate_limit = ENV['SINEW_TEST'] ? 0 : 1
+
+      # default .csv file for :output
       default_output = begin
         src = method(:run).source_location.first
         dst = File.join(File.dirname(src), "#{File.basename(src, File.extname(src))}.csv")
@@ -25,7 +29,7 @@ module Sinew
       end
 
       #
-      # note: use HTTPDisk::Sloptions
+      # note: uses HTTPDisk::Sloptions
       #
 
       @sinew_options = HTTPDisk::Sloptions.parse(options) do
@@ -43,7 +47,7 @@ module Sinew
         _1.boolean :force_errors
         _1.array :ignore_params
 
-        # more handy options
+        # more runtime options
         _1.hash :headers
         _1.boolean :insecure
         _1.string :output, default: default_output
@@ -56,6 +60,7 @@ module Sinew
       @sinew_csv = CSV.new(sinew_options[:output])
     end
 
+    # main entry point, used by Sinew::Main
     def run
       raise 'subclass must override run'
     end
@@ -64,6 +69,7 @@ module Sinew
     # requests
     #
 
+    # http get, returns a Response
     def get(url, params = nil, headers = nil)
       faraday_response = faraday.get(url, params, headers) do
         _1.options[:proxy] = random_proxy
@@ -71,6 +77,7 @@ module Sinew
       Response.new(faraday_response)
     end
 
+    # http post, returns a Response. Defaults to form body type.
     def post(url, body = nil, headers = nil)
       faraday_response = faraday.post(url, body, headers) do
         _1.options[:proxy] = random_proxy
@@ -78,12 +85,14 @@ module Sinew
       Response.new(faraday_response)
     end
 
+    # http post json, returns a Response
     def post_json(url, body = nil, headers = nil)
       body = body.to_json
       headers = (headers || {}).merge('Content-Type' => 'application/json')
       post(url, body, headers)
     end
 
+    # Faraday connection for this recipe
     def faraday
       raise 'forgot to call super from initialize' if !sinew_options
 
@@ -96,10 +105,14 @@ module Sinew
     # csv
     #
 
+    # Ouptut a csv header. This usually happens automatically, but you can call
+    # this method directly to ensure a consistent set of columns.
     def csv_header(*columns)
       sinew_csv.start(columns.flatten)
     end
 
+    # Output a csv row. Row should be any object that can turn into a hash - a
+    # hash, OpenStruct, etc.
     def csv_emit(row)
       row = row.to_h
       sinew_mutex.synchronize do
@@ -121,21 +134,23 @@ module Sinew
     # header/footer
     #
 
+    # Called by Sinew::Main to output the header.
     def sinew_header
-      banner("Writing to #{sinew_csv.path}...")
+      sinew_banner("Writing to #{sinew_csv.path}...")
     end
 
+    # Called by Sinew::Main to output the footer.
     def sinew_footer(elapsed)
       count = sinew_csv.count
 
       if count == 0
-        banner(format('Done in %ds. Nothing written.', elapsed))
+        sinew_banner(format('Done in %ds. Nothing written.', elapsed))
         return
       end
 
       # summary
       msg = format('Done in %ds. Wrote %d rows to %s. Summary:', elapsed, count, sinew_csv.path)
-      banner(msg)
+      sinew_banner(msg)
 
       # tally
       tally = sinew_csv.tally.sort_by { [-_2, _1.to_s] }.to_h
@@ -154,20 +169,23 @@ module Sinew
     RED = "\e[1;37;41m".freeze
     GREEN = "\e[1;37;42m".freeze
 
-    def banner(msg, color: GREEN)
+    # Print a nice green banner.
+    def sinew_banner(msg, color: GREEN)
       msg = "#{msg} ".ljust(72, ' ')
       msg = "[#{Time.new.strftime('%H:%M:%S')}] #{msg}"
       msg = "#{color}#{msg}#{RESET}" if $stdout.tty?
       puts msg
     end
 
-    def fatal(msg)
-      banner(msg, color: RED)
+    # Print a scary red banner and exit.
+    def sinew_fatal(msg)
+      sinew_banner(msg, color: RED)
       exit 1
     end
 
     protected
 
+    # Return a random proxy.
     def random_proxy
       return if !sinew_options[:proxy]
 
@@ -176,6 +194,7 @@ module Sinew
       proxies.sample
     end
 
+    # Create the Faraday connection for making requests.
     def create_faraday
       faraday_options = sinew_options.slice(:headers, :params)
       if sinew_options[:insecure]

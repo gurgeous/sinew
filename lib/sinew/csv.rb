@@ -10,7 +10,7 @@ module Sinew
       @path = path
     end
 
-    # start writing
+    # start writing the csv
     def start(columns)
       raise 'started twice' if started?
 
@@ -21,11 +21,12 @@ module Sinew
       end
     end
 
+    # has this csv been started?
     def started?
       @csv != nil
     end
 
-    # append
+    # append a row
     def emit(row)
       # convert row to cols, and construct print (our return value)
       print = {}

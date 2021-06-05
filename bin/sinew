@@ -5,7 +5,7 @@ $LOAD_PATH.unshift(File.join(__dir__, '../lib'))
 BIN = File.basename($PROGRAM_NAME)
 
 #
-# Load the bare minimum and parse args with slop. We do this separately for speed.
+# Load the bare minimum and parse args with slop. For speed.
 #
 
 require 'sinew/args'
