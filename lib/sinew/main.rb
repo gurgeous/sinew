@@ -1,4 +1,6 @@
 module Sinew
+  # Helper class used by sinew bin. This exists as an independent class solely
+  # for testing, otherwise it would be built into the bin script.
   class Main
     attr_reader :options
 
