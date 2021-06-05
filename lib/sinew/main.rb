@@ -23,18 +23,18 @@ module Sinew
 
     protected
 
-    # low level helper for instantiating the recipe
+    # Low level helper for instantiating the recipe. We ask Sinew::Base for the
+    # most recently defined subclass. This can fail in certain edge cases (dup
+    # or multiple subclasses) but should be perfect for running sinew xxx.rb.
     def load_recipe
-      # does it exist?
-      path = options[:recipe]
-
       # load file
-      require(File.expand_path(path))
-      klass = IO.read(path)[/class ([A-Z][A-Za-z0-9_]*)\s*<\s*Sinew::Base/, 1]
-      raise "could not find a Sinew::Base subclass in #{path.inspect}" if !klass
+      require(File.expand_path(options[:recipe]))
 
       # instantiate
-      Object.const_get(klass).new(options)
+      klass = Sinew::Base.subclasses.last
+      raise "no Sinew::Base subclass found in #{options[:recipe].inspect}" if !klass
+
+      klass.new(options)
     end
   end
 end

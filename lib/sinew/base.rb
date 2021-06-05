@@ -183,6 +183,21 @@ module Sinew
       exit 1
     end
 
+    #
+    # helpers for finding recipe subclasses
+    #
+
+    # used by Sinew::Main
+    def self.subclasses
+      @subclasses ||= []
+    end
+
+    # this is a Ruby callback
+    def self.inherited(subclass)
+      super
+      subclasses << subclass
+    end
+
     protected
 
     # Return a random proxy.
