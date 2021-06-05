@@ -6,10 +6,12 @@ module Sinew
       @options = options
     end
 
+    def recipe
+      @recipe ||= load_recipe
+    end
+
     def run
       tm = Time.now
-
-      recipe = load_recipe
       recipe.sinew_header if !options[:silent]
       begin
         recipe.run

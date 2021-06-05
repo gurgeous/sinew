@@ -23,7 +23,7 @@ class TestCsv < MiniTest::Test
 
   def test_normalize
     csv = Sinew::CSV.new(nil)
-    noko = Nokogiri::HTML(IO.read("#{__dir__}/test.html"))
+    noko = Nokogiri::HTML(test_html)
 
     assert_nil csv.normalize(nil)
     assert_nil csv.normalize('')

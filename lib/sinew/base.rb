@@ -19,7 +19,7 @@ module Sinew
       @sinew_options = HTTPDisk::Sloptions.parse(options) do
         # cli
         _1.integer :limit
-        _1.integer :max_time, default: 30
+        _1.integer :timeout, default: 30
         _1.boolean :silent
         _1.on :proxy, type: [:string, Array]
         _1.boolean :verbose

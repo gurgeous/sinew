@@ -15,8 +15,8 @@ module Sinew
       slop = Slop.parse(args) do |o|
         o.banner = 'Usage: sinew [options] [recipe]'
         o.integer '-l', '--limit', 'quit after emitting this many rows'
-        o.integer '-m', '--max-time', 'maximum time allowed for the transfer'
         o.string '--proxy', 'use host[:port] as HTTP proxy (can be a comma-delimited list)'
+        o.integer '--timeout', 'maximum time allowed for the transfer'
         o.bool '-s', '--silent', 'suppress some output'
         o.bool '-v', '--verbose', 'dump emitted rows while running'
 

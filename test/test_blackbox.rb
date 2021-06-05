@@ -8,16 +8,8 @@ class TestBlackbox < MiniTest::Test
     assert_match(/From httpdisk/i, output)
 
     # real simple end-to-end test, no network required
-    blackbox = "#{@tmpdir}/blackbox.rb"
-    IO.write(blackbox, <<~EOF)
-      class Blackbox < Sinew::Base
-        def run
-          csv_emit(a: 1)
-        end
-      end
-    EOF
-
-    output = `bin/sinew #{blackbox}`
+    recipe = recipe('csv_emit(a: 1)')
+    output = `bin/sinew #{recipe}`
     assert $CHILD_STATUS.success?
     assert_match(/Done/i, output)
   end

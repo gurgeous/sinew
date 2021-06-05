@@ -18,5 +18,25 @@ module MiniTest
       FileUtils.rm_rf(@tmpdir)
       WebMock.reset!
     end
+
+    protected
+
+    def test_html
+      IO.read("#{__dir__}/test.html")
+    end
+
+    def recipe(code)
+      code = <<~EOF
+        class Recipe < Sinew::Base
+          def run
+            #{code}
+          end
+        end
+      EOF
+
+      "#{@tmpdir}/recipe.rb".tap do
+        IO.write(_1, code)
+      end
+    end
   end
 end
