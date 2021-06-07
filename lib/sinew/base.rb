@@ -189,7 +189,7 @@ module Sinew
 
     # used by Sinew::Main
     def self.subclasses
-      @subclasses ||= []
+      @@subclasses ||= []
     end
 
     # this is a Ruby callback
