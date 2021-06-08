@@ -79,6 +79,43 @@ class TestBase < MiniTest::Test
     assert_requested :post, 'host', body: '{"a":1}', headers: { b: '2', 'Content-Type': 'application/json' }
   end
 
+  #
+  # httpdisk
+  #
+
+  def test_httpdisk_status
+    base = self.base(params: { a: 1 })
+
+    # we'll test these in a sec
+    base.get('http://host/get?b=2', c: 3)
+    base.post('http://host/post_string?b=2', 'string')
+    base.post('http://host/post_form?b=2', { form: 'form' })
+    base.post_json('http://host/post_json?b=2', { json: 'json' })
+
+    # miss
+    assert !base.httpdisk_cached?('get', 'http://host/blah')
+
+    # hits
+    assert base.httpdisk_cached?('get', 'http://host/get?b=2', c: 3)
+    assert base.httpdisk_cached?('post', 'http://host/post_string?b=2', nil, 'string')
+    assert base.httpdisk_cached?('post', 'http://host/post_form?b=2', nil, { form: 'form' })
+    assert base.httpdisk_cached?('post', 'http://host/post_json?b=2', nil, { json: 'json' }.to_json)
+  end
+
+  def test_httpdisk_uncache
+    base, url = self.base, 'http://host/blah'
+
+    assert !base.httpdisk_cached?('get', url) # miss
+    base.get(url)
+    assert base.httpdisk_cached?('get', url) # hit
+    base.httpdisk_uncache('get', url)
+    assert !base.httpdisk_cached?('get', url) # back to miss
+  end
+
+  #
+  # csv
+  #
+
   def test_csv
     load recipe('csv_header(:a, :b) ; csv_emit(a: 1)')
     recipe = Recipe.new

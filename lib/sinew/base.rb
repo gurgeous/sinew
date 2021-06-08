@@ -102,6 +102,50 @@ module Sinew
     end
 
     #
+    # httpdisk
+    #
+
+    # find the httpdisk instance
+    def httpdisk
+      @httpdisk ||= begin
+        app = faraday.app
+        app = app.app until app.is_a?(HTTPDisk::Client)
+        app
+      end
+    end
+
+    # Returns true if request is cached. If body is a hash, it will be form
+    # encoded.
+    def httpdisk_cached?(method, url, params = nil, body = nil)
+      status = httpdisk_status(method, url, params, body)
+      status[:status] != 'miss'
+    end
+
+    # Remove cache file, if any. If body is a hash, it will be form encoded.
+    def httpdisk_uncache(method, url, params = nil, body = nil)
+      status = httpdisk_status(method, url, params, body)
+      path = status[:path]
+      File.unlink(path) if File.exist?(path)
+    end
+
+    # Check httpdisk status for this request. If body is a hash, it will be form encoded.
+    def httpdisk_status(method, url, params = nil, body = nil)
+      # if body is a hash, convert to url encoded form
+      # see lib/faraday/request/url_encoded.rb
+      if body.is_a?(Hash)
+        body = Faraday::Utils::ParamsHash[body].to_query
+      end
+
+      env = Faraday::Env.new.tap do
+        _1.method = method.to_s.downcase.to_sym
+        _1.request_headers = {}
+        _1.request_body = body
+        _1.url = faraday.build_url(url, params)
+      end
+      httpdisk.status(env)
+    end
+
+    #
     # csv
     #
 

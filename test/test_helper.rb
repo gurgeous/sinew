@@ -13,17 +13,10 @@ module MiniTest
     def setup
       @tmpdir = Dir.mktmpdir('sinew')
       @httpbingo_stub = stub_request(:any, /httpbingo/).to_return { httpbingo(_1) }
-      # like httpbingo, for testing
-      # stub_request(:get, %r{http://[^/]+/html}).to_return(method(:respond_html))
-      # stub_request(:get, %r{http://[^/]+/get\b}).to_return(method(:respond_echo))
-      # stub_request(:post, %r{http://[^/]+/post\b}).to_return(method(:respond_echo))
-      # stub_request(:get, %r{http://[^/]+/status/\d+}).to_return(method(:respond_status))
-      # stub_request(:get, %r{http://[^/]+/(relative-)?redirect/\d+}).to_return(method(:respond_redirect))
-      # stub_request(:get, %r{http://[^/]+/delay/\d+}).to_timeout
-      # stub_request(:get, %r{http://[^/]+/xml}).to_return(method(:respond_xml))
     end
 
     def teardown
+      Object.send(:remove_const, 'Recipe') if Object.const_defined?('Recipe')
       FileUtils.rm_rf(@tmpdir)
       WebMock.reset!
     end

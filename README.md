@@ -216,6 +216,14 @@ Each request method returns a `Sinew::Response`. The response has several helper
 - `csv_header(columns)` - specify the columns for CSV output. If you don't call this, Sinew will use the keys from the first call to `csv_emit`.
 - `csv_emit(hash)` - append a row to the CSV file
 
+#### Advanced: Cache
+
+Sinew::Base has some advanced helpers for checking the httpdisk cache. For the following methods, if `body` is a `Hash` it will be converted to an encoded form body.
+
+- `httpdisk_cached?(method, url, params = nil, body = nil)` - check if request is cached
+- `httpdisk_uncache(method, url, params = nil, body = nil)` - remove cache file, if any
+- `httpdisk_status(method, url, params = nil, body = nil)` - get httpdisk status
+
 ## Hints
 
 Writing Sinew recipes is fun and easy. The builtin caching means you can iterate quickly, since you won't have to re-fetch the data. Here are some hints for writing idiomatic recipes:
