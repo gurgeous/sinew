@@ -218,7 +218,7 @@ Each request method returns a `Sinew::Response`. The response has several helper
 
 #### Advanced: Cache
 
-Sinew::Base has some advanced helpers for checking the httpdisk cache. For the following methods, if `body` is a `Hash` it will be converted to an encoded form body.
+Sinew::Base has some advanced helpers for checking the httpdisk cache. For the following methods, `body` hashes default to form body type.
 
 - `httpdisk_cached?(method, url, params = nil, body = nil)` - check if request is cached
 - `httpdisk_uncache(method, url, params = nil, body = nil)` - remove cache file, if any
