@@ -52,7 +52,7 @@ module Sinew
         _1.boolean :insecure
         _1.string :output, default: default_output
         _1.hash :params
-        _1.integer :rate_limit, default: default_rate_limit
+        _1.float :rate_limit, default: default_rate_limit
         _1.integer :retries, default: 2
         _1.on :url_prefix, type: [:string, URI]
       end
