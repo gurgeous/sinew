@@ -9,6 +9,11 @@ module Sinew
     # Like body, but tries to cleanup whitespace around HTML for easier parsing.
     def html
       @html ||= body.dup.tap do
+        # fix invalid utf8
+        if _1.encoding == Encoding::UTF_8
+          _1.encode!('UTF-8', invalid: :replace, undef: :replace, replace: '?')
+        end
+
         # squish
         _1.strip!
         _1.gsub!(/\s+/, ' ')
