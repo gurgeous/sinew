@@ -42,5 +42,15 @@ module Sinew
     def url
       env.url
     end
+
+    # Return the cache diskpath for this response
+    def diskpath
+      env[:httpdisk_diskpath]
+    end
+
+    # Remove cached response from disk, if any
+    def uncache
+      File.unlink(diskpath) if File.exist?(diskpath)
+    end
   end
 end
