@@ -285,14 +285,15 @@ module Sinew
         #
 
         # rate limit
-        _1.request :rate_limiter, interval: sinew_options[:rate_limit]
+        rate_limit = sinew_options[:rate_limit]
+        _1.request :rate_limiter, interval: rate_limit
 
         # After httpdisk so that only non-cached requests are logged.
         # Before retry so that we don't log each retry attempt.
         _1.response :logger, nil, formatter: Middleware::LogFormatter if !sinew_options[:silent]
 
         retry_options = {
-          interval: sinew_options[:rate_limit],
+          max_interval: rate_limit, # very important, negates Retry-After: 86400
           max: sinew_options[:retries],
           methods: %w[delete get head options patch post put trace],
           retry_statuses: (500..600).to_a,
