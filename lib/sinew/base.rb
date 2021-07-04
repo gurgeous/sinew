@@ -46,6 +46,7 @@ module Sinew
         _1.float :rate_limit, default: default_rate_limit
         _1.integer :retries, default: 2
         _1.on :url_prefix, type: [:string, URI]
+        _1.boolean :utf8, default: true
       end
 
       @csv = CSV.new(opts[:output])
@@ -204,9 +205,6 @@ module Sinew
         # auto-encode form bodies
         _1.request :url_encoded
 
-        # set Ruby string encoding based on Content-Type
-        _1.response :encoding
-
         # Before httpdisk so each redirect segment is cached
         # Keep track of redirect status for logger
         _1.response :follow_redirects, callback: ->(_old_env, new_env) { new_env[:redirect] = true }
@@ -215,7 +213,7 @@ module Sinew
         # httpdisk
         #
 
-        httpdisk_options = options.slice(:dir, :expires, :force, :force_errors, :ignore_params)
+        httpdisk_options = options.slice(:dir, :expires, :force, :force_errors, :ignore_params, :utf8)
         _1.use :httpdisk, httpdisk_options
 
         #

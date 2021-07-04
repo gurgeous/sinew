@@ -28,7 +28,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'faraday-encoding', '~> 0'
   s.add_dependency 'faraday-rate_limiter', '~> 0.0'
   s.add_dependency 'hashie', '~> 4.1'
-  s.add_dependency 'httpdisk', '~> 0'
+  s.add_dependency 'httpdisk', '~> 0.5'
   s.add_dependency 'nokogiri', '~> 1.11'
   s.add_dependency 'slop', '~> 4.8'
   s.add_dependency 'sterile', '~> 1.0'

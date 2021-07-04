@@ -7,6 +7,7 @@ module Sinew
 
     def initialize(path)
       @count = 0
+      @csv = nil
       @path = path
     end
 

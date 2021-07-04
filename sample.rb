@@ -1,6 +1,6 @@
-require_relative "lib/sinew"
+require_relative 'lib/sinew'
 
-sinew = Sinew.new(output: "sample.csv", verbose: true)
+sinew = Sinew.new(output: 'sample.csv', verbose: true)
 
 response = sinew.get 'http://httpbingo.org'
 response.noko.css('ul li a').each do |a|

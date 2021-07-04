@@ -17,9 +17,9 @@ class TestMain < MiniTest::Test
   def test_bad_options
     [
       '',
-      'a.rb b.rb',
-      '--expires 1z ignore.rb',
-      'not_found.rb',
+      'a.sinew b.sinew',
+      '--expires 1z ignore.sinew',
+      'not_found.sinew',
     ].each do |args|
       assert_raises { sinew(args) }
     end

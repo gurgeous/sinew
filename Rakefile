@@ -13,7 +13,7 @@ spec = Gem::Specification.load('sinew.gemspec')
 # test (default)
 Rake::TestTask.new do
   _1.libs << 'test'
-  _1.warning = false # sterile has a few issues here
+  # _1.warning = false
 end
 task default: :test
 

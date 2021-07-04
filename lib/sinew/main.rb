@@ -12,7 +12,7 @@ module Sinew
         dst
       end
 
-      @sinew = Sinew.new(options)
+      @sinew = Sinew::Base.new(options)
     end
 
     def run

@@ -123,12 +123,26 @@ class TestBase < MiniTest::Test
     assert_equal("a,b\n1,\n", IO.read(sinew.csv.path))
   end
 
+  #
+  # utf8
+  #
+
+  def test_utf8
+    stub_request(:get, 'cafe').to_return(
+      headers: { 'Content-Type' => 'text/html; charset=iso-8859-1' },
+      body: 'café'.encode('ISO-8859-1')
+    )
+    response = sinew.get 'http://cafe'
+    assert_equal Encoding::UTF_8, response.body.encoding
+    assert_equal 'café', response.body
+  end
+
   protected
 
   def sinew(args = {})
     args[:dir] = @tmpdir if !args.key?(:dir)
     args[:silent] = true if !args.key?(:silent)
     args[:output] = "#{@tmpdir}/output.csv"
-    Sinew.new(args)
+    Sinew::Base.new(args)
   end
 end

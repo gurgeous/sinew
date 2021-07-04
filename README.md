@@ -2,7 +2,7 @@
 
 ## Welcome to Sinew
 
-Sinew is a Ruby library for collecting data from web sites (scraping). Though small, this project is the culmination of years of effort based on crawling systems built at several different companies.
+Sinew is a Ruby library for collecting data from web sites (scraping). Though small, this project is the culmination of years of effort based on crawling systems built at several different companies. Sinew has been used to crawl millions of websites.
 
 ## Key Features
 
@@ -38,32 +38,26 @@ gem 'sinew'
 
 **Breaking change**
 
-We are pleased to announce the release of Sinew 4. Sinew 4 uses a `Sinew::Base` class instead of `.sinew` files. This makes it possible to use Sinew from the command line or embedded in another application. Also, Sinew 4 uses Response objects instead of relying on a DSL to faciliate parallelism.
+We are pleased to announce the release of Sinew 4. The Sinew DSL exposes a single `sinew` method in lieu of the many methods exposed in Sinew 3. Because of this single entry point, Sinew is now much easier to embed in other applications. Also, each Sinew 4 request returns a full Response object to faciliate parallelism.
 
 Sinew uses the [Faraday](https://lostisland.github.io/faraday/) HTTP client with the [httpdisk](https://github.com/gurgeous/httpdisk/) middleware for aggressive caching of responses.
 
 ## Quick Example
 
-Here's an example for collecting the links from httpbingo.org. Paste this into a file called `sample.rb` and run `sinew sample.rb`. It will create a `sample.csv` file containing the href and text for each link:
+Here's an example for collecting the links from httpbingo.org. Paste this into a file called `sample.sinew` and run `sinew sample.sinew`. It will create a `sample.csv` file containing the href and text for each link:
 
 ```ruby
-# run with:
-# $ sinew links.rb
-class Links < Sinew::Base
-  def run
-    # get the url
-    response = get "https://httpbingo.org"
+# get the url
+response = sinew.get "https://httpbingo.org"
 
-    # use nokogiri to collect links
-    response.noko.css("ul li a").each do |a|
-      row = { }
-      row[:url] = a[:href]
-      row[:title] = a.text
+# use nokogiri to collect links
+response.noko.css("ul li a").each do |a|
+  row = { }
+  row[:url] = a[:href]
+  row[:title] = a.text
 
-      # append a row to the csv
-      csv_emit(row)
-    end
-  end
+  # append a row to the csv
+  sinew.csv_emit(row)
 end
 ```
 
@@ -73,41 +67,25 @@ There are three main features provided by Sinew.
 
 #### Recipes
 
-Sinew uses recipe files to crawl web sites. Each recipe is a subclass of
-`Sinew::Base`. Use the `sinew` command to load and run a recipe. Here's a
-trivial example that calls `get` to make an HTTP GET request:
+Sinew uses recipe files to crawl web sites. Recipes have the .sinew extension, but they are plain old Ruby. Here's a trivial example that calls `get` to make an HTTP GET request:
 
 ```ruby
-# run with:
-# $ sinew google.rb
-class Google < Sinew::Base
-  def run
-    response = get "https://www.google.com/search?q=darwin"
-    response = get "https://www.google.com/search", q: "charles darwin"
-  end
-end
+response = sinew.get "https://www.google.com/search?q=darwin"
+response = sinew.get "https://www.google.com/search", q: "charles darwin"
 ```
 
-Once you've done a `get`, you can access the document in a few different
-formats. In general, it's easiest to use `noko` to automatically parse and
-interact with HTML results. If Nokogiri isn't appropriate, fall back to regular expressions run against `body` or `html`. Use `json` if you are expecting a JSON response.
+Once you've done a `get`, you can access the document in a few different formats. In general, it's easiest to use `noko` to automatically parse and interact with HTML results. If Nokogiri isn't appropriate, fall back to regular expressions run against `body` or `html`. Use `json` if you are expecting a JSON response.
 
 ```ruby
-# run with:
-# $ sinew links2.rb
-class Links2 < Sinew::Base
-  def run
-    response = get "https://www.google.com/search?q=darwin"
+response = sinew.get "https://www.google.com/search?q=darwin"
 
-    # pull out the links with nokogiri
-    links = response.noko.css("a").map { _1[:href] }
-    puts links.inspect
+# pull out the links with nokogiri
+links = response.noko.css("a").map { _1[:href] }
+puts links.inspect
 
-    # or, use a regex
-    links = response.html[/<a[^>]+href="([^"]+)/, 1]
-    puts links.inspect
-  end
-end
+# or, use a regex
+links = response.html[/<a[^>]+href="([^"]+)/, 1]
+puts links.inspect
 ```
 
 #### CSV Output
@@ -115,18 +93,12 @@ end
 Recipes output CSV files. To continue the example above:
 
 ```ruby
-# run with:
-# $ sinew serps.rb
-class Serps < Sinew::Base
-  def run
-    response = get "https://www.google.com/search?q=darwin"
-    response.noko.css("a").each do |i|
-      row = { }
-      row[:href] = i[:href]
-      row[:text] = i.text
-      csv_emit row
-    end
-  end
+response = sinew.get "https://www.google.com/search?q=darwin"
+response.noko.css("a").each do |i|
+  row = { }
+  row[:href] = i[:href]
+  row[:text] = i.text
+  sinew.csv_emit row
 end
 ```
 
@@ -164,24 +136,15 @@ From httpdisk:
     --force-errors  don't read errors from cache (but still write)
 ```
 
-`Sinew::Base` also has many runtime options that can be set by overriding the initializer in your recipe. For example:
+`Sinew` also has many runtime options that can be set by in your recipe. For example:
 
 ```ruby
-# run with:
-# $ sinew my_user_agent.rb
-class MyUserAgent < Sinew::Base
-  def initialize(options)
-    options[:headers] = { 'User-Agent' => 'xyz' }
-    super(options)
-  end
+sinew.options[:headers] = { 'User-Agent' => 'xyz' }
 
-  def run
-    # ...
-  end
-end
+...
 ```
 
-Here is the list of available options for `Sinew::Base`:
+Here is the list of available options for `Sinew`:
 
 - **headers** - default HTTP headers to use on every request
 - **ignore_params** - ignore these query params when generating httpdisk cache keys
@@ -195,9 +158,9 @@ Here is the list of available options for `Sinew::Base`:
 
 #### Making HTTP requests
 
-- `get(url, params = nil, headers = nil)` - fetch a url with GET
-- `post(url, body = nil, headers = nil)` - fetch a url with POST, using `form` as the URL encoded POST body.
-- `post_json(url, body = nil, headers = nil)` - fetch a url with POST, using `json` as the POST body.
+- `sinew.get(url, params = nil, headers = nil)` - fetch a url with GET
+- `sinew.post(url, body = nil, headers = nil)` - fetch a url with POST, using `form` as the URL encoded POST body.
+- `sinew.post_json(url, body = nil, headers = nil)` - fetch a url with POST, using `json` as the POST body.
 
 #### Parsing the response
 
@@ -213,16 +176,21 @@ Each request method returns a `Sinew::Response`. The response has several helper
 
 #### Writing CSV
 
-- `csv_header(columns)` - specify the columns for CSV output. If you don't call this, Sinew will use the keys from the first call to `csv_emit`.
-- `csv_emit(hash)` - append a row to the CSV file
+- `sinew.csv_header(columns)` - specify the columns for CSV output. If you don't call this, Sinew will use the keys from the first call to `sinew.csv_emit`.
+- `sinew.csv_emit(hash)` - append a row to the CSV file
 
 #### Advanced: Cache
 
-Sinew::Base has some advanced helpers for checking the httpdisk cache. For the following methods, `body` hashes default to form body type.
+Sinew has some advanced helpers for checking the httpdisk cache. For the following methods, `body` hashes default to form body type.
 
-- `cached?(method, url, params = nil, body = nil)` - check if request is cached
-- `uncache(method, url, params = nil, body = nil)` - remove cache file, if any
-- `status(method, url, params = nil, body = nil)` - get httpdisk status
+- `sinew.cached?(method, url, params = nil, body = nil)` - check if request is cached
+- `sinew.uncache(method, url, params = nil, body = nil)` - remove cache file, if any
+- `sinew.status(method, url, params = nil, body = nil)` - get httpdisk status
+
+Plus some caching helpers in Sinew::Response:
+
+- `diskpath` - the location on disk for the cached httpdisk response
+- `uncache` - remove cache file for this response
 
 ## Hints
 
@@ -255,7 +223,8 @@ end.map(&:text)
 
 #### 4.0.0 (unreleased)
 
-- Rewritten to use Sinew::Base and simpler DSL
+- Rewritten to use simpler DSL
+- Upgraded to httpdisk 0.5 to take advantage of the new encoding support
 
 #### 3.0.0 (May 2021)
 
