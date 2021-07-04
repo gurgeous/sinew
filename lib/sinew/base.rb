@@ -5,13 +5,12 @@ require 'faraday-rate_limiter'
 require 'httpdisk'
 
 module Sinew
-  # Base class for Sinew recipes. Some effort was made to avoid naming
-  # collisions for subclasses.
+  # Sinew base class, for in standalone scripts or via the sinew binary.
   class Base
-    attr_reader :sinew_csv, :sinew_mutex, :sinew_options
+    attr_reader :csv, :mutex, :options
 
-    def initialize(options = {})
-      @sinew_mutex = Mutex.new
+    def initialize(opts = {})
+      @mutex = Mutex.new
 
       #
       # defaults for Sloptions
@@ -20,19 +19,11 @@ module Sinew
       # default :rate_limit, typically 1
       default_rate_limit = ENV['SINEW_TEST'] ? 0 : 1
 
-      # default .csv file for :output
-      default_output = begin
-        src = method(:run).source_location.first
-        dst = File.join(File.dirname(src), "#{File.basename(src, File.extname(src))}.csv")
-        dst = dst.sub(%r{^./}, '') # nice to clean this up
-        dst
-      end
-
       #
       # note: uses HTTPDisk::Sloptions
       #
 
-      @sinew_options = HTTPDisk::Sloptions.parse(options) do
+      @options = HTTPDisk::Sloptions.parse(opts) do
         # cli
         _1.integer :limit
         _1.integer :timeout, default: 30
@@ -50,19 +41,14 @@ module Sinew
         # more runtime options
         _1.hash :headers
         _1.boolean :insecure
-        _1.string :output, default: default_output
+        _1.string :output, required: true
         _1.hash :params
         _1.float :rate_limit, default: default_rate_limit
         _1.integer :retries, default: 2
         _1.on :url_prefix, type: [:string, URI]
       end
 
-      @sinew_csv = CSV.new(sinew_options[:output])
-    end
-
-    # main entry point, used by Sinew::Main
-    def run
-      raise 'subclass must override run'
+      @csv = CSV.new(opts[:output])
     end
 
     #
@@ -94,9 +80,7 @@ module Sinew
 
     # Faraday connection for this recipe
     def faraday
-      raise 'forgot to call super from initialize' if !sinew_options
-
-      sinew_mutex.synchronize do
+      mutex.synchronize do
         @faraday ||= create_faraday
       end
     end
@@ -106,20 +90,20 @@ module Sinew
     #
 
     # Returns true if request is cached. Defaults to form body type.
-    def httpdisk_cached?(method, url, params = nil, body = nil)
-      status = httpdisk_status(method, url, params, body)
+    def cached?(method, url, params = nil, body = nil)
+      status = status(method, url, params, body)
       status[:status] != 'miss'
     end
 
     # Remove cache file, if any. Defaults to form body type.
-    def httpdisk_uncache(method, url, params = nil, body = nil)
-      status = httpdisk_status(method, url, params, body)
+    def uncache(method, url, params = nil, body = nil)
+      status = status(method, url, params, body)
       path = status[:path]
       File.unlink(path) if File.exist?(path)
     end
 
     # Check httpdisk status for this request. Defaults to form body type.
-    def httpdisk_status(method, url, params = nil, body = nil)
+    def status(method, url, params = nil, body = nil)
       # if hash, default to url encoded form
       # see lib/faraday/request/url_encoded.rb
       if body.is_a?(Hash)
@@ -142,56 +126,25 @@ module Sinew
     # Output a csv header. This usually happens automatically, but you can call
     # this method directly to ensure a consistent set of columns.
     def csv_header(*columns)
-      sinew_csv.start(columns.flatten)
+      csv.start(columns.flatten)
     end
 
     # Output a csv row. Row should be any object that can turn into a hash - a
     # hash, OpenStruct, etc.
     def csv_emit(row)
       row = row.to_h
-      sinew_mutex.synchronize do
+      mutex.synchronize do
         # header if necessary
-        csv_header(row.keys) if !sinew_csv.started?
+        csv_header(row.keys) if !csv.started?
 
         # emit
-        print = sinew_csv.emit(row)
-        puts print.ai if sinew_options[:verbose]
+        print = csv.emit(row)
+        puts print.ai if options[:verbose]
 
         # this is caught by Sinew::Main
-        if sinew_csv.count == sinew_options[:limit]
+        if csv.count == options[:limit]
           raise LimitError
         end
-      end
-    end
-
-    #
-    # header/footer
-    #
-
-    # Called by Sinew::Main to output the header.
-    def sinew_header
-      sinew_banner("Writing to #{sinew_csv.path}...")
-    end
-
-    # Called by Sinew::Main to output the footer.
-    def sinew_footer(elapsed)
-      count = sinew_csv.count
-
-      if count == 0
-        sinew_banner(format('Done in %ds. Nothing written.', elapsed))
-        return
-      end
-
-      # summary
-      msg = format('Done in %ds. Wrote %d rows to %s. Summary:', elapsed, count, sinew_csv.path)
-      sinew_banner(msg)
-
-      # tally
-      tally = sinew_csv.tally.sort_by { [-_2, _1.to_s] }.to_h
-      len = tally.keys.map { _1.to_s.length }.max
-      fmt = "  %-#{len + 1}s %7d/%-7d %5.1f%%\n"
-      tally.each do
-        printf(fmt, _1, _2, count, _2 * 100.0 / count)
       end
     end
 
@@ -204,7 +157,7 @@ module Sinew
     GREEN = "\e[1;37;42m".freeze
 
     # Print a nice green banner.
-    def sinew_banner(msg, color: GREEN)
+    def banner(msg, color: GREEN)
       msg = "#{msg} ".ljust(72, ' ')
       msg = "[#{Time.new.strftime('%H:%M:%S')}] #{msg}"
       msg = "#{color}#{msg}#{RESET}" if $stdout.tty?
@@ -212,49 +165,34 @@ module Sinew
     end
 
     # Print a scary red banner and exit.
-    def sinew_fatal(msg)
-      sinew_banner(msg, color: RED)
+    def fatal(msg)
+      banner(msg, color: RED)
       exit 1
-    end
-
-    #
-    # helpers for finding recipe subclasses
-    #
-
-    # used by Sinew::Main
-    def self.subclasses
-      @@subclasses ||= []
-    end
-
-    # this is a Ruby callback
-    def self.inherited(subclass)
-      super
-      subclasses << subclass
     end
 
     protected
 
     # Return a random proxy.
     def random_proxy
-      return if !sinew_options[:proxy]
+      return if !options[:proxy]
 
-      proxies = sinew_options[:proxy]
+      proxies = options[:proxy]
       proxies = proxies.split(',') if !proxies.is_a?(Array)
       proxies.sample
     end
 
     # Create the Faraday connection for making requests.
     def create_faraday
-      faraday_options = sinew_options.slice(:headers, :params)
-      if sinew_options[:insecure]
+      faraday_options = options.slice(:headers, :params)
+      if options[:insecure]
         faraday_options[:ssl] = { verify: false }
       end
       Faraday.new(nil, faraday_options) do
         # options
-        if sinew_options[:url_prefix]
-          _1.url_prefix = sinew_options[:url_prefix]
+        if options[:url_prefix]
+          _1.url_prefix = options[:url_prefix]
         end
-        _1.options.timeout = sinew_options[:timeout]
+        _1.options.timeout = options[:timeout]
 
         #
         # middleware that runs on both disk/network requests
@@ -277,7 +215,7 @@ module Sinew
         # httpdisk
         #
 
-        httpdisk_options = sinew_options.slice(:dir, :expires, :force, :force_errors, :ignore_params)
+        httpdisk_options = options.slice(:dir, :expires, :force, :force_errors, :ignore_params)
         _1.use :httpdisk, httpdisk_options
 
         #
@@ -285,16 +223,16 @@ module Sinew
         #
 
         # rate limit
-        rate_limit = sinew_options[:rate_limit]
+        rate_limit = options[:rate_limit]
         _1.request :rate_limiter, interval: rate_limit
 
         # After httpdisk so that only non-cached requests are logged.
         # Before retry so that we don't log each retry attempt.
-        _1.response :logger, nil, formatter: Middleware::LogFormatter if !sinew_options[:silent]
+        _1.response :logger, nil, formatter: Middleware::LogFormatter if !options[:silent]
 
         retry_options = {
           max_interval: rate_limit, # very important, negates Retry-After: 86400
-          max: sinew_options[:retries],
+          max: options[:retries],
           methods: %w[delete get head options patch post put trace],
           retry_statuses: (500..600).to_a,
           retry_if: ->(_env, _err) { true },

@@ -13,4 +13,11 @@ require 'sinew/middleware/log_formatter'
 module Sinew
   # flow control for --limit
   class LimitError < StandardError; end
+
+  # shortcut for Sinew::Base.new
+  class << self
+    def new(**args)
+      Sinew::Base.new(**args)
+    end
+  end
 end

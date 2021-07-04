@@ -1,13 +1,13 @@
-class Sample < Sinew::Base
-  def run
-    response = get 'http://httpbingo.org'
-    response.noko.css('ul li a').each do |a|
-      row = {}
-      row[:url] = a[:href]
-      row[:title] = a.text
-      csv_emit(row)
-    end
+require_relative "lib/sinew"
 
-    get 'http://httpbingo.org/redirect/2'
-  end
+sinew = Sinew.new(output: "sample.csv", verbose: true)
+
+response = sinew.get 'http://httpbingo.org'
+response.noko.css('ul li a').each do |a|
+  row = {}
+  row[:url] = a[:href]
+  row[:title] = a.text
+  sinew.csv_emit(row)
 end
+
+sinew.get 'http://httpbingo.org/redirect/2'
