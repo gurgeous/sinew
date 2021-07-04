@@ -19,7 +19,7 @@ task default: :test
 
 # Watch rb files, run tests whenever something changes
 task :watch do
-  sh "find . -name '*.rb' | entr -c rake"
+  sh "find . -name '*.rb' -o -name '*.sinew' | entr -c rake"
 end
 
 #

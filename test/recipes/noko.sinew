@@ -1,0 +1,9 @@
+response = sinew.get 'http://httpbingo.org/xml'
+response.noko.css('slide title').each do
+  sinew.csv_emit(title: _1.text)
+end
+
+# OUTPUT
+# title
+# Wake up to WonderWidgets!
+# Overview

@@ -220,9 +220,9 @@ Each request method returns a `Sinew::Response`. The response has several helper
 
 Sinew::Base has some advanced helpers for checking the httpdisk cache. For the following methods, `body` hashes default to form body type.
 
-- `httpdisk_cached?(method, url, params = nil, body = nil)` - check if request is cached
-- `httpdisk_uncache(method, url, params = nil, body = nil)` - remove cache file, if any
-- `httpdisk_status(method, url, params = nil, body = nil)` - get httpdisk status
+- `cached?(method, url, params = nil, body = nil)` - check if request is cached
+- `uncache(method, url, params = nil, body = nil)` - remove cache file, if any
+- `status(method, url, params = nil, body = nil)` - get httpdisk status
 
 ## Hints
 
@@ -255,7 +255,7 @@ end.map(&:text)
 
 #### 4.0.0 (unreleased)
 
-- Rewritten to use Sinew::Base
+- Rewritten to use Sinew::Base and simpler DSL
 
 #### 3.0.0 (May 2021)
 

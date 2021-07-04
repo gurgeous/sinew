@@ -13,7 +13,7 @@ module Sinew
   module Args
     def self.slop(args)
       slop = Slop.parse(args) do |o|
-        o.banner = 'Usage: sinew [options] [recipe]'
+        o.banner = 'Usage: sinew [options] [recipe.sinew]'
         o.integer '-l', '--limit', 'quit after emitting this many rows'
         o.string '--proxy', 'use host[:port] as HTTP proxy (can be a comma-delimited list)'
         o.integer '--timeout', 'maximum time allowed for the transfer'

@@ -1,0 +1,5 @@
+sinew.csv_emit(name: 'bob', address: 'main')
+
+# OUTPUT
+# name,address
+# bob,main

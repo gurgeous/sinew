@@ -16,7 +16,6 @@ module MiniTest
     end
 
     def teardown
-      Object.send(:remove_const, 'Recipe') if Object.const_defined?('Recipe')
       FileUtils.rm_rf(@tmpdir)
       WebMock.reset!
     end
@@ -25,15 +24,7 @@ module MiniTest
 
     # write a tmp recipe with code, return the path
     def recipe(code)
-      code = <<~EOF
-        class Recipe < Sinew::Base
-          def run
-            #{code}
-          end
-        end
-      EOF
-
-      File.join(@tmpdir, 'recipe.rb').tap do
+      File.join(@tmpdir, 'recipe.sinew').tap do
         IO.write(_1, code)
       end
     end

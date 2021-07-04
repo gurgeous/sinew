@@ -3,7 +3,7 @@ require 'test_helper'
 class TestRecipes < MiniTest::Test
   def test_recipes
     Dir.chdir(File.join(__dir__, 'recipes')) do
-      Dir['*.rb'].sort.each do |path|
+      Dir['*.sinew'].sort.each do |path|
         # run
         actual = File.join(@tmpdir, 'test.csv')
         main = Sinew::Main.new(dir: @tmpdir, silent: true, recipe: path, output: actual)

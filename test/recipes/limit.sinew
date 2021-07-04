@@ -1,0 +1,9 @@
+sinew.options[:limit] = 3
+
+(1..5).each { sinew.csv_emit(i: _1) }
+
+# OUTPUT
+# i
+# 1
+# 2
+# 3

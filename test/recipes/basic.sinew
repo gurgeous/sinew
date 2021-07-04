@@ -1,0 +1,8 @@
+response = sinew.get 'http://httpbingo.org/html'
+response.body.scan(/<h1>([^<]+)/) do
+  sinew.csv_emit(h1: Regexp.last_match(1))
+end
+
+# OUTPUT
+# h1
+# Herman Melville - Moby-Dick
