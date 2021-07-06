@@ -1,4 +1,4 @@
-require 'test_helper'
+require_relative 'test_helper'
 
 class TestNokogiriExt < MiniTest::Test
   def test_inner_text

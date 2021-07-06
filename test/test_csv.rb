@@ -1,4 +1,4 @@
-require 'test_helper'
+require_relative 'test_helper'
 
 class TestCsv < MiniTest::Test
   def test_emit

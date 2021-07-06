@@ -11,10 +11,7 @@ spec = Gem::Specification.load('sinew.gemspec')
 #
 
 # test (default)
-Rake::TestTask.new do
-  _1.libs << 'test'
-  # _1.warning = false
-end
+Rake::TestTask.new
 task default: :test
 
 # Watch rb files, run tests whenever something changes
