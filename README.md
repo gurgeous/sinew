@@ -221,7 +221,7 @@ end.map(&:text)
 
 ## Changelog
 
-#### 4.0.0 (unreleased)
+#### 4.0.0 (July 2021)
 
 - Rewritten to use simpler DSL
 - Upgraded to httpdisk 0.5 to take advantage of the new encoding support
