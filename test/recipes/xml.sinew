@@ -1,6 +1,6 @@
-get 'http://httpbingo.org/html'
-noko.css('h1').each do |h1|
-  csv_emit(h1: h1.text)
+response = sinew.get 'http://httpbingo.org/html'
+response.noko.css('h1').each do
+  sinew.csv_emit(h1: _1.text)
 end
 
 # OUTPUT

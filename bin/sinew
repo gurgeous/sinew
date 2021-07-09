@@ -1,53 +1,25 @@
 #!/usr/bin/env ruby
 
-$LOAD_PATH.unshift("#{__dir__}/../lib")
+$LOAD_PATH.unshift(File.join(__dir__, '../lib'))
+
+BIN = File.basename($PROGRAM_NAME)
+
+#
+# Load the bare minimum and parse args with slop. For speed.
+#
+
+require 'sinew/args'
+begin
+  slop = Sinew::Args.slop(ARGV)
+rescue Slop::Error => e
+  $stderr.puts "#{BIN}: #{e}" if e.message != ''
+  $stderr.puts("#{BIN}: try '#{BIN} --help' for more information")
+  exit 1
+end
+
+#
+# now load everything and run
+#
 
 require 'sinew'
-require 'slop'
-
-#
-# options
-#
-
-options = Slop.parse do |o|
-  o.banner = 'Usage: sinew [options] <gub.sinew>'
-  o.bool '-v', '--verbose', 'dump emitted rows while running'
-  o.bool '-q', '--quiet', 'suppress some output'
-  o.integer '-l', '--limit', 'quit after emitting this many rows'
-  o.string '-c', '--cache', 'set custom cache directory', default: "#{ENV['HOME']}/.sinew"
-  o.bool '--force', "don't read anything from cache (but still write)"
-  o.bool '--force-errors', "don't read errors from cache (but still write)"
-  o.string '--proxy', 'use host[:port] as HTTP proxy'
-  o.bool '--version', 'show version and exit'
-  o.on('--help', 'show this help') do
-    puts o
-    exit
-  end
-end
-
-if options[:version]
-  puts Sinew::VERSION
-  exit
-end
-
-#
-# recipe
-#
-
-recipe = options.arguments.first
-if !recipe
-  Scripto.fatal('need a .sinew file to run against')
-end
-if !File.exist?(recipe)
-  Scripto.fatal("#{recipe} not found")
-end
-if options.arguments.length > 1
-  Scripto.fatal('can only run on one .sinew file')
-end
-options = options.to_h.merge(recipe: recipe)
-
-#
-# main
-#
-
-Sinew::Main.new(options).run
+Sinew::Main.new(slop).run

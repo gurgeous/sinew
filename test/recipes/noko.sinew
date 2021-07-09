@@ -1,6 +1,6 @@
-get 'http://httpbingo.org/xml'
-noko.css('slide title').each do |title|
-  csv_emit(title: title.text)
+response = sinew.get 'http://httpbingo.org/xml'
+response.noko.css('slide title').each do
+  sinew.csv_emit(title: _1.text)
 end
 
 # OUTPUT

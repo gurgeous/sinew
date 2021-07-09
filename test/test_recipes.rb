@@ -1,60 +1,33 @@
 require_relative 'test_helper'
 
-class TestRecipe < MiniTest::Test
-  DIR = File.expand_path('recipes', __dir__)
-  TEST_SINEW = "#{TMP}/test.sinew".freeze
-  TEST_CSV = "#{TMP}/test.csv".freeze
-
+class TestRecipes < MiniTest::Test
   def test_recipes
-    Dir.chdir(DIR) do
-      Dir['*.sinew'].sort.each do |filename|
-        recipe = IO.read(filename)
-
-        # get ready
-        IO.write(TEST_SINEW, recipe)
-        sinew = Sinew::Main.new(cache: TMP, quiet: true, recipe: TEST_SINEW)
-
-        # read OPTIONS
-        if options = options_from(recipe)
-          options.each do |key, value|
-            sinew.options[key] = value
-          end
-        end
-
-        # read OUTPUT
-        output = output_from(recipe, filename)
-
+    Dir.chdir(File.join(__dir__, 'recipes')) do
+      Dir['*.sinew'].sort.each do |path|
         # run
-        sinew.run
+        actual = File.join(@tmpdir, 'test.csv')
+        main = Sinew::Main.new(dir: @tmpdir, silent: true, recipe: path, output: actual)
+        main.run
 
-        # assert
-        csv = IO.read(TEST_CSV)
-        assert_equal(output, csv, "Output didn't match for recipes/#{filename}")
+        # check
+        expected = output_from(path)
+        actual = IO.read(actual)
+        assert_equal expected, actual, "output didn't match for test/recipes/#{path}"
       end
     end
   end
 
-  def options_from(recipe)
-    if options = recipe[/^#\s*OPTIONS\s*(\{.*\})/, 1]
-      # rubocop:disable Security/Eval
-      eval(options)
-      # rubocop:enable Security/Eval
-    end
-  end
-  protected :options_from
+  protected
 
-  def output_from(recipe, filename)
-    lines = recipe.split("\n")
-    first_line = lines.index { |i| i =~ /^# OUTPUT/ }
-    if !first_line
-      raise "# OUTPUT not found in recipes/#{filename}"
-    end
+  def output_from(path)
+    lines = IO.read(path).split("\n")
+    first_line = lines.index { _1 =~ /^# OUTPUT/ }
+    raise "# OUTPUT not found in test/recipes/#{path}" if !first_line
 
     output = lines[first_line + 1..]
-    output = output.map { |i| i.gsub(/^# /, '') }
+    output = output.map { _1.gsub(/^# /, '') }
     output = output.join("\n")
     output += "\n"
     output
   end
-  protected :output_from
 end

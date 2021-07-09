@@ -1,9 +1,23 @@
-require_relative 'sinew/core_ext'
-require_relative 'sinew/dsl'
-require_relative 'sinew/main'
-require_relative 'sinew/nokogiri_ext'
-require_relative 'sinew/output'
-require_relative 'sinew/request'
-require_relative 'sinew/response'
-require_relative 'sinew/runtime_options'
-require_relative 'sinew/version'
+# sinew
+require 'sinew/args'
+require 'sinew/base'
+require 'sinew/csv'
+require 'sinew/main'
+require 'sinew/nokogiri_ext'
+require 'sinew/response'
+require 'sinew/version'
+
+# custom faraday middleware
+require 'sinew/middleware/log_formatter'
+
+module Sinew
+  # flow control for --limit
+  class LimitError < StandardError; end
+
+  # shortcut for Sinew::Base.new
+  class << self
+    def new(**args)
+      Sinew::Base.new(**args)
+    end
+  end
+end

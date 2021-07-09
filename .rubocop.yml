@@ -1,52 +1,34 @@
 AllCops:
-  TargetRubyVersion: 2.7
   NewCops: enable
+  SuggestExtensions: false
+  TargetRubyVersion: 2.7
 
-# amd: customizations
-Layout/SpaceInsideArrayLiteralBrackets:
-  EnforcedStyle: compact
-Layout/CaseIndentation:
-  EnforcedStyle: end
-Layout/EndAlignment:
-  EnforcedStyleAlignWith: variable
-Style/CollectionMethods:
-  Enabled: true
-  PreferredMethods:
-    reduce: inject
-Style/EmptyMethod:
-  Enabled: false
-Style/TrailingCommaInArrayLiteral:
-  EnforcedStyleForMultiline: consistent_comma
-Style/TrailingCommaInHashLiteral:
-  EnforcedStyleForMultiline: consistent_comma
+# this is buggy in 2.7.0
+Style/HashTransformValues: { Enabled: false }
 
-# amd: these seem extreme
-Lint/AssignmentInCondition: { Enabled: false } # I do this all the time
-Lint/SuppressedException: { Enabled: false } # blank rescues are useful
-Naming/BinaryOperatorParameterName: { Enabled: false } # silly
-Naming/HeredocDelimiterNaming: { Enabled: false } # silly
-Naming/MethodParameterName: { Enabled: false } # silly
-Style/AccessorGrouping: { Enabled: false } # silly
-Style/AsciiComments: { Enabled: false } # silly
-Style/ClassAndModuleChildren: { Enabled: false } # silly
-Style/Documentation: { Enabled: false } # we don't need this
-Style/DoubleNegation: { Enabled: false } # silly
-Style/FormatStringToken: { Enabled: false } # we like printf here
-Style/FrozenStringLiteralComment: { Enabled: false } # seems excessive
-Style/GuardClause: { Enabled: false } # confusing
-Style/HashTransformValues: { Enabled: false } # breaks code by trying to apply to an array
-Style/IfUnlessModifier: { Enabled: false } # personally I hate unless
-Style/NegatedIf: { Enabled: false } # these are fine
-Style/Next: { Enabled: false } # these are fine
-Style/NumericPredicate: { Enabled: false } # silly
-Style/ParallelAssignment: { Enabled: false } # these are fine
-Style/PerlBackrefs: { Enabled: false } # these are fine
-Style/RaiseArgs: { Enabled: false } # silly
-Style/RedundantAssignment: { Enabled: false } # these are usually on purpose
-Style/RegexpLiteral: { Enabled: false } # these are fine
-Style/SoleNestedConditional: { Enabled: false } # these are fine
-Style/StderrPuts: { Enabled: false } # this is awful
-
-# amd: these Metric rules are annoying, disable
-Metrics:
-  Enabled: false
+# minimal personal preference
+Layout/CaseIndentation: { Enabled: false }
+Layout/EndAlignment: { EnforcedStyleAlignWith: variable }
+Lint/AssignmentInCondition: { Enabled: false }
+Lint/NonLocalExitFromIterator: { Enabled: false }
+Metrics: { Enabled: false }
+Naming/HeredocDelimiterNaming: { Enabled: false }
+Naming/MethodParameterName: { Enabled: false }
+Naming/VariableNumber: { Enabled: false }
+Style/AsciiComments: { Enabled: false }
+Style/ClassVars: { Enabled: false }
+Style/CommentAnnotation: { Enabled: false }
+Style/Documentation: { Enabled: false }
+Style/DoubleNegation: { Enabled: false }
+Style/EmptyCaseCondition: { Enabled: false }
+Style/FormatStringToken: { Enabled: false }
+Style/FrozenStringLiteralComment: { Enabled: false }
+Style/GuardClause: { Enabled: false }
+Style/IfUnlessModifier: { Enabled: false }
+Style/NegatedIf: { Enabled: false }
+Style/NumericPredicate: { Enabled: false }
+Style/ParallelAssignment: { Enabled: false }
+Style/StderrPuts: { Enabled: false }
+Style/StringConcatenation: { Enabled: false }
+Style/TrailingCommaInArrayLiteral: { EnforcedStyleForMultiline: consistent_comma }
+Style/TrailingCommaInHashLiteral: { EnforcedStyleForMultiline: consistent_comma }

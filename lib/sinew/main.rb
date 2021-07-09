@@ -1,98 +1,72 @@
-require 'scripto'
-require 'sinew/connection'
-
-#
-# Main sinew entry point.
-#
-
 module Sinew
-  class Main < Scripto::Main
-    attr_reader :runtime_options
+  # Helper class used by sinew bin. This exists as an independent class solely
+  # for testing, otherwise it would be built into the bin script.
+  class Main
+    attr_reader :sinew
 
     def initialize(options)
-      super(options)
+      options[:output] ||= begin
+        src = options[:recipe]
+        dst = File.join(File.dirname(src), "#{File.basename(src, File.extname(src))}.csv")
+        dst = dst.sub(%r{^./}, '') # nice to clean this up
+        dst
+      end
 
-      # init
-      @runtime_options = RuntimeOptions.new
+      @sinew = Sinew::Base.new(options)
     end
 
     def run
-      dsl.run
-      footer if !quiet?
+      tm = Time.now
+      header if !sinew.options[:silent]
+      recipe = sinew.options[:recipe]
+      dsl = DSL.new(sinew)
+      begin
+        dsl.instance_eval(File.read(recipe, mode: 'rb'), recipe)
+      rescue LimitError
+        # ignore - this is flow control for --limit
+      end
+      footer(Time.now - tm) if !sinew.options[:silent]
     end
 
-    def quiet?
-      options[:quiet]
-    end
-
-    def dsl
-      @dsl ||= DSL.new(self)
-    end
+    protected
 
     #
-    # http requests
+    # header/footer
     #
 
-    def http(method, url, options = {})
-      request = Request.new(method, url, request_options(options))
-      response = request.perform(connection)
+    def header
+      sinew.banner("Writing to #{sinew.csv.path}...")
+    end
 
-      # always log error messages
-      if response.error?
-        puts "xxx http request failed with #{response.code}"
+    def footer(elapsed)
+      csv = sinew.csv
+      count = csv.count
+
+      if count == 0
+        sinew.banner(format('Done in %ds. Nothing written.', elapsed))
+        return
       end
 
-      response
-    end
+      # summary
+      msg = format('Done in %ds. Wrote %d rows to %s. Summary:', elapsed, count, csv.path)
+      sinew.banner(msg)
 
-    def connection
-      @connection ||= Connection.create(options: options, runtime_options: runtime_options)
-    end
-    protected :connection
-
-    #
-    # output
-    #
-
-    def output
-      @output ||= Output.new(self)
-    end
-
-    #
-    # helpers
-    #
-
-    def request_options(options)
-      options.dup.tap do |req|
-        req[:headers] = {}.tap do |h|
-          [ runtime_options.headers, options[:headers]].each do
-            h.merge!(_1) if _1
-          end
-        end
-        req[:proxy] = random_proxy
+      # tally
+      tally = csv.tally.sort_by { [-_2, _1.to_s] }.to_h
+      len = tally.keys.map { _1.to_s.length }.max
+      fmt = "  %-#{len + 1}s %7d/%-7d %5.1f%%\n"
+      tally.each do
+        printf(fmt, _1, _2, count, _2 * 100.0 / count)
       end
     end
-    protected :request_options
 
-    PROXY_RE = /\A#{URI::PATTERN::HOST}(:\d+)?\Z/.freeze
+    # simple DSL for .sinew files
+    class DSL
+      attr_reader :sinew
 
-    def random_proxy
-      return if !options[:proxy]
-
-      proxy = options[:proxy].split(',').sample
-      if proxy !~ PROXY_RE
-        raise ArgumentError, "invalid proxy #{proxy.inspect}, should be host[:port]"
+      def initialize(sinew)
+        @sinew = sinew
       end
-
-      "http://#{proxy}"
     end
-    protected :random_proxy
-
-    def footer
-      output.report
-      finished = output.count > 0 ? "Finished #{output.filename}" : 'Finished'
-      banner("#{finished} in #{dsl.elapsed.to_i}s.")
-    end
-    protected :footer
   end
 end

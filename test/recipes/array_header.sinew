@@ -1,6 +1,6 @@
-csv_header(%i[n a p])
-csv_emit(n: 'n1', a: 'a1')
+sinew.csv_header(%i[n a p z])
+sinew.csv_emit(n: 'n1', a: 'a1')
 
 # OUTPUT
-# n,a,p
-# n1,a1,""
+# n,a,p,z
+# n1,a1,,

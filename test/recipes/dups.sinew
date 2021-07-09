@@ -1,7 +1,0 @@
-5.times do
-  csv_emit(url: 'https://gub')
-end
-
-# OUTPUT
-# url
-# https://gub

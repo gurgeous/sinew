@@ -1,6 +1,6 @@
-get 'http://httpbingo.org/html'
-raw.scan(/<h1>([^<]+)/) do
-  csv_emit(h1: $1)
+response = sinew.get 'http://httpbingo.org/html'
+response.body.scan(/<h1>([^<]+)/) do
+  sinew.csv_emit(h1: Regexp.last_match(1))
 end
 
 # OUTPUT

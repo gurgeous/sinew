@@ -1,72 +1,61 @@
-require 'stringio'
-require 'zlib'
-
-#
-# An HTTP response.
-#
+require 'delegate'
+require 'hashie/mash'
+require 'json'
+require 'nokogiri'
 
 module Sinew
-  class Response
-    attr_accessor :request, :uri, :body, :code, :headers
-
-    #
-    # factory methods
-    #
-
-    def self.from_network(request, fday_response)
-      Response.new.tap do
-        _1.request = request
-        _1.uri = fday_response.env.url
-        _1.code = fday_response.status
-        _1.headers = fday_response.headers.to_h
-        _1.body = process_body(fday_response)
-      end
-    end
-
-    # helper for decoding bodies before parsing
-    def self.process_body(response)
-      body = response.body
-
-      # inflate if necessary
-      bits = body[0, 10].force_encoding('BINARY')
-      if bits =~ /\A\x1f\x8b/n
-        body = Zlib::GzipReader.new(StringIO.new(body)).read
-      end
-
-      # force to utf-8 if we think this could be text
-      if body.encoding != Encoding::UTF_8
-        if content_type = response.headers['content-type']
-          if content_type =~ /\b(html|javascript|json|text|xml)\b/
-            body = body.encode('UTF-8', invalid: :replace, undef: :replace, replace: '?')
-          end
+  # A wrapper around Faraday::Response, with some parsing helpers.
+  class Response < SimpleDelegator
+    # Like body, but tries to cleanup whitespace around HTML for easier parsing.
+    def html
+      @html ||= body.dup.tap do
+        # fix invalid utf8
+        if _1.encoding == Encoding::UTF_8
+          _1.encode!('UTF-8', invalid: :replace, undef: :replace, replace: '?')
         end
+
+        # squish
+        _1.strip!
+        _1.gsub!(/\s+/, ' ')
+
+        # kill whitespace around tags
+        _1.gsub!(/ ?<([^>]+)> ?/, '<\\1>')
       end
-
-      body
     end
 
-    #
-    # accessors
-    #
-
-    def error?
-      code >= 400
+    # Return body as JSON
+    def json
+      @json ||= JSON.parse(body, symbolize_names: true)
     end
 
-    def error_500?
-      code / 100 >= 5
+    # Return JSON body as Hashie::Mash
+    def mash
+      @mash ||= Hashie::Mash.new(json)
     end
 
-    def redirected?
-      request.uri != uri
+    # Return body HTML as Nokogiri document
+    def noko
+      @noko ||= Nokogiri::HTML(html)
     end
 
-    def head_as_json
-      {
-        uri: uri,
-        code: code,
-        headers: headers,
-      }
+    # Return body XML as Nokogiri document
+    def xml
+      @xml ||= Nokogiri::XML(html)
+    end
+
+    # Return the final URI for the request, after redirects
+    def url
+      env.url
+    end
+
+    # Return the cache diskpath for this response
+    def diskpath
+      env[:httpdisk_diskpath]
+    end
+
+    # Remove cached response from disk, if any
+    def uncache
+      File.unlink(diskpath) if File.exist?(diskpath)
     end
   end
 end

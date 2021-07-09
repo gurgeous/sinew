@@ -1,4 +1,4 @@
-csv_emit(name: 'bob', address: 'main')
+sinew.csv_emit(name: 'bob', address: 'main')
 
 # OUTPUT
 # name,address

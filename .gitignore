@@ -1,7 +1,5 @@
+.ruby-version
+.yardoc
 *.gem
-.bundle
-Gemfile.lock
-pkg/*
-rdoc
+doc/
 sample.csv
-TAGS

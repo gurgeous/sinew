@@ -1,11 +1,11 @@
 source 'http://rubygems.org'
+gemspec
 
-group :development do
+group :development, :test do
   gem 'minitest'
   gem 'mocha'
+  gem 'pry'
   gem 'rake'
-  gem 'rubocop', '~> 0.91.0', require: false
+  gem 'rubocop', '~> 1.18'
   gem 'webmock'
 end
-
-gemspec

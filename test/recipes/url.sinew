@@ -1,0 +1,11 @@
+# This tests get by URI, URI math, and csv_emit with url
+response = sinew.get(URI.parse('http://httpbingo.org/html'))
+sinew.csv_emit(url: response.url)
+
+response = sinew.get(response.url + '/get')
+sinew.csv_emit(url: response.url)
+
+# OUTPUT
+# url
+# http://httpbingo.org/html
+# http://httpbingo.org/get
