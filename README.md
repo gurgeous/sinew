@@ -106,7 +106,7 @@ Sinew creates a CSV file with the same name as the recipe, and `csv_emit(hash)` 
 
 1.  Nokogiri nodes are converted to text
 1.  Arrays are joined with "|", so you can separate them later
-1.  HTML tags, entities and non-ascii chars are removed
+1.  [HTML tags](https://www.scaler.com/topics/html/html-tags/), entities and non-ascii chars are removed
 1.  Whitespace is squished
 
 #### Caching
