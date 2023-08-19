@@ -8,7 +8,7 @@ require "webmock/minitest"
 # a hint to sinew, so that it'll do things like set rate limit to zero
 ENV["SINEW_TEST"] = "1"
 
-module MiniTest
+module Minitest
   class Test
     def setup
       @tmpdir = Dir.mktmpdir("sinew")

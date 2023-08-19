@@ -1,6 +1,6 @@
 require_relative "test_helper"
 
-class TestNokogiriExt < MiniTest::Test
+class TestNokogiriExt < Minitest::Test
   def test_inner_text
     noko = Nokogiri::HTML(test_html).css("#nokogiri_ext")
 

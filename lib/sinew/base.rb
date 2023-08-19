@@ -1,7 +1,8 @@
 require "amazing_print"
 require "faraday-encoding"
-require "faraday/logging/formatter"
 require "faraday-rate_limiter"
+require "faraday/logging/formatter"
+require "faraday/retry"
 require "httpdisk"
 
 module Sinew

@@ -12,7 +12,7 @@ Gem::Specification.new do |s|
   s.description = "Crawl web sites easily using ruby recipes, with caching and nokogiri."
   s.homepage = "http://github.com/gurgeous/sinew"
   s.license = "MIT"
-  s.required_ruby_version = ">= 2.7"
+  s.required_ruby_version = ">= 3.1"
 
   # what's in the gem?
   s.files = Dir.chdir(File.expand_path(__dir__)) do
@@ -23,13 +23,14 @@ Gem::Specification.new do |s|
   s.require_paths = ["lib"]
 
   # gem dependencies
-  s.add_dependency "amazing_print", "~> 1.3"
-  s.add_dependency "faraday", "~> 1.4"
-  s.add_dependency "faraday-encoding", "~> 0"
-  s.add_dependency "faraday-rate_limiter", "~> 0.0"
-  s.add_dependency "hashie", "~> 4.1"
-  s.add_dependency "httpdisk", "~> 0.5"
-  s.add_dependency "nokogiri", "~> 1.11"
-  s.add_dependency "slop", "~> 4.8"
-  s.add_dependency "sterile", "~> 1.0"
+  s.add_dependency "amazing_print"
+  s.add_dependency "faraday"
+  s.add_dependency "faraday-encoding"
+  s.add_dependency "faraday-rate_limiter"
+  s.add_dependency "faraday-retry"
+  s.add_dependency "hashie"
+  s.add_dependency "httpdisk"
+  s.add_dependency "nokogiri"
+  s.add_dependency "slop"
+  s.add_dependency "sterile"
 end

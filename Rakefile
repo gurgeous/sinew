@@ -1,5 +1,5 @@
 require "bundler/setup"
-require "rake/testtask"
+require "minitest/test_task"
 
-Rake::TestTask.new
 task default: :test
+Minitest::TestTask.create

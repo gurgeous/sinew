@@ -1,6 +1,6 @@
 require_relative "test_helper"
 
-class TestRecipes < MiniTest::Test
+class TestRecipes < Minitest::Test
   def test_recipes
     Dir.chdir(File.join(__dir__, "recipes")) do
       Dir["*.sinew"].sort.each do |path|

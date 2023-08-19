@@ -1,6 +1,6 @@
 require_relative "test_helper"
 
-class TestBase < MiniTest::Test
+class TestBase < Minitest::Test
   def setup
     super
     stub_request(:any, /host/)

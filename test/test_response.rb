@@ -1,6 +1,6 @@
 require_relative "test_helper"
 
-class TestResponse < MiniTest::Test
+class TestResponse < Minitest::Test
   def test_bodies
     assert_equal "<hey>you", response(" <hey>  you  ").html
     assert_equal({a: 1}, response('{"a":1}').json)

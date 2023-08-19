@@ -1,6 +1,6 @@
 require_relative "test_helper"
 
-class TestMain < MiniTest::Test
+class TestMain < Minitest::Test
   def test_blackbox
     # --help (fast)
     output = `bin/sinew --help`

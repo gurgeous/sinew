@@ -1,6 +1,6 @@
 require_relative "test_helper"
 
-class TestCsv < MiniTest::Test
+class TestCsv < Minitest::Test
   def test_emit
     csv = Sinew::CSV.new(File.join(@tmpdir, "test.csv"))
     csv.start(%i[a b])
