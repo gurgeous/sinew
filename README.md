@@ -1,4 +1,4 @@
-[![Build Status](https://github.com/gurgeous/sinew/workflows/test/badge.svg?branch=master)](https://github.com/gurgeous/sinew/action)
+[![Build Status](https://github.com/gurgeous/sinew/workflows/test/badge.svg?branch=main)](https://github.com/gurgeous/sinew/action)
 
 ## Welcome to Sinew
 
