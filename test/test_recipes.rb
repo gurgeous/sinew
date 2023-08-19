@@ -1,11 +1,11 @@
-require_relative 'test_helper'
+require_relative "test_helper"
 
 class TestRecipes < MiniTest::Test
   def test_recipes
-    Dir.chdir(File.join(__dir__, 'recipes')) do
-      Dir['*.sinew'].sort.each do |path|
+    Dir.chdir(File.join(__dir__, "recipes")) do
+      Dir["*.sinew"].sort.each do |path|
         # run
-        actual = File.join(@tmpdir, 'test.csv')
+        actual = File.join(@tmpdir, "test.csv")
         main = Sinew::Main.new(dir: @tmpdir, silent: true, recipe: path, output: actual)
         main.run
 
@@ -25,7 +25,7 @@ class TestRecipes < MiniTest::Test
     raise "# OUTPUT not found in test/recipes/#{path}" if !first_line
 
     output = lines[first_line + 1..]
-    output = output.map { _1.gsub(/^# /, '') }
+    output = output.map { _1.gsub(/^# /, "") }
     output = output.join("\n")
     output += "\n"
     output

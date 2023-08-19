@@ -8,7 +8,7 @@ module Sinew
       options[:output] ||= begin
         src = options[:recipe]
         dst = File.join(File.dirname(src), "#{File.basename(src, File.extname(src))}.csv")
-        dst = dst.sub(%r{^./}, '') # nice to clean this up
+        dst = dst.sub(%r{^./}, "") # nice to clean this up
         dst
       end
 
@@ -21,7 +21,7 @@ module Sinew
       recipe = sinew.options[:recipe]
       dsl = DSL.new(sinew)
       begin
-        dsl.instance_eval(File.read(recipe, mode: 'rb'), recipe)
+        dsl.instance_eval(File.read(recipe, mode: "rb"), recipe)
       rescue LimitError
         # ignore - this is flow control for --limit
       end
@@ -43,12 +43,12 @@ module Sinew
       count = csv.count
 
       if count == 0
-        sinew.banner(format('Done in %ds. Nothing written.', elapsed))
+        sinew.banner(format("Done in %ds. Nothing written.", elapsed))
         return
       end
 
       # summary
-      msg = format('Done in %ds. Wrote %d rows to %s. Summary:', elapsed, count, csv.path)
+      msg = format("Done in %ds. Wrote %d rows to %s. Summary:", elapsed, count, csv.path)
       sinew.banner(msg)
 
       # tally

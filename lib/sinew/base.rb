@@ -1,8 +1,8 @@
-require 'amazing_print'
-require 'faraday-encoding'
-require 'faraday/logging/formatter'
-require 'faraday-rate_limiter'
-require 'httpdisk'
+require "amazing_print"
+require "faraday-encoding"
+require "faraday/logging/formatter"
+require "faraday-rate_limiter"
+require "httpdisk"
 
 module Sinew
   # Sinew base class, for in standalone scripts or via the sinew binary.
@@ -17,7 +17,7 @@ module Sinew
       #
 
       # default :rate_limit, typically 1
-      default_rate_limit = ENV['SINEW_TEST'] ? 0 : 1
+      default_rate_limit = ENV["SINEW_TEST"] ? 0 : 1
 
       #
       # note: uses HTTPDisk::Sloptions
@@ -32,7 +32,7 @@ module Sinew
         _1.boolean :verbose
 
         # httpdisk
-        _1.string :dir, default: File.join(ENV['HOME'], '.sinew')
+        _1.string :dir, default: File.join(ENV["HOME"], ".sinew")
         _1.integer :expires
         _1.boolean :force
         _1.boolean :force_errors
@@ -75,7 +75,7 @@ module Sinew
     # http post json, returns a Response
     def post_json(url, body = nil, headers = nil)
       body = body.to_json
-      headers = (headers || {}).merge('Content-Type' => 'application/json')
+      headers = (headers || {}).merge("Content-Type" => "application/json")
       post(url, body, headers)
     end
 
@@ -93,7 +93,7 @@ module Sinew
     # Returns true if request is cached. Defaults to form body type.
     def cached?(method, url, params = nil, body = nil)
       status = status(method, url, params, body)
-      status[:status] != 'miss'
+      status[:status] != "miss"
     end
 
     # Remove cache file, if any. Defaults to form body type.
@@ -159,8 +159,8 @@ module Sinew
 
     # Print a nice green banner.
     def banner(msg, color: GREEN)
-      msg = "#{msg} ".ljust(72, ' ')
-      msg = "[#{Time.new.strftime('%H:%M:%S')}] #{msg}"
+      msg = "#{msg} ".ljust(72, " ")
+      msg = "[#{Time.new.strftime("%H:%M:%S")}] #{msg}"
       msg = "#{color}#{msg}#{RESET}" if $stdout.tty?
       puts msg
     end
@@ -178,7 +178,7 @@ module Sinew
       return if !options[:proxy]
 
       proxies = options[:proxy]
-      proxies = proxies.split(',') if !proxies.is_a?(Array)
+      proxies = proxies.split(",") if !proxies.is_a?(Array)
       proxies.sample
     end
 
@@ -186,7 +186,7 @@ module Sinew
     def create_faraday
       faraday_options = options.slice(:headers, :params)
       if options[:insecure]
-        faraday_options[:ssl] = { verify: false }
+        faraday_options[:ssl] = {verify: false}
       end
       Faraday.new(nil, faraday_options) do
         # options
@@ -233,7 +233,7 @@ module Sinew
           max: options[:retries],
           methods: %w[delete get head options patch post put trace],
           retry_statuses: (500..600).to_a,
-          retry_if: ->(_env, _err) { true },
+          retry_if: ->(_env, _err) { true }
         }
         _1.request :retry, retry_options
       end

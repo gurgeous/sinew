@@ -1,34 +1,17 @@
+require:
+  - standard
+
+inherit_gem:
+  standard: config/base.yml
+
 AllCops:
   NewCops: enable
   SuggestExtensions: false
-  TargetRubyVersion: 2.7
+  TargetRubyVersion: 3.1
 
-# this is buggy in 2.7.0
-Style/HashTransformValues: { Enabled: false }
+#
+# fight with standardrb!
+#
 
-# minimal personal preference
-Layout/CaseIndentation: { Enabled: false }
-Layout/EndAlignment: { EnforcedStyleAlignWith: variable }
-Lint/AssignmentInCondition: { Enabled: false }
-Lint/NonLocalExitFromIterator: { Enabled: false }
-Metrics: { Enabled: false }
-Naming/HeredocDelimiterNaming: { Enabled: false }
-Naming/MethodParameterName: { Enabled: false }
-Naming/VariableNumber: { Enabled: false }
-Style/AsciiComments: { Enabled: false }
-Style/ClassVars: { Enabled: false }
-Style/CommentAnnotation: { Enabled: false }
-Style/Documentation: { Enabled: false }
-Style/DoubleNegation: { Enabled: false }
-Style/EmptyCaseCondition: { Enabled: false }
-Style/FormatStringToken: { Enabled: false }
-Style/FrozenStringLiteralComment: { Enabled: false }
-Style/GuardClause: { Enabled: false }
-Style/IfUnlessModifier: { Enabled: false }
-Style/NegatedIf: { Enabled: false }
-Style/NumericPredicate: { Enabled: false }
-Style/ParallelAssignment: { Enabled: false }
-Style/StderrPuts: { Enabled: false }
-Style/StringConcatenation: { Enabled: false }
-Style/TrailingCommaInArrayLiteral: { EnforcedStyleForMultiline: consistent_comma }
-Style/TrailingCommaInHashLiteral: { EnforcedStyleForMultiline: consistent_comma }
+Style/RedundantReturn: { Enabled: false }
+Style/HashSyntax: { EnforcedShorthandSyntax: always }
