@@ -23,14 +23,14 @@ Gem::Specification.new do |s|
   s.require_paths = ["lib"]
 
   # gem dependencies
-  s.add_dependency "amazing_print"
-  s.add_dependency "faraday"
-  s.add_dependency "faraday-encoding"
-  s.add_dependency "faraday-rate_limiter"
-  s.add_dependency "faraday-retry"
-  s.add_dependency "hashie"
-  s.add_dependency "httpdisk"
-  s.add_dependency "nokogiri"
-  s.add_dependency "slop"
-  s.add_dependency "sterile"
+  s.add_dependency "amazing_print", "~> 1.5"
+  s.add_dependency "faraday", "~> 2.7"
+  s.add_dependency "faraday-encoding", "~> 0.0"
+  s.add_dependency "faraday-rate_limiter", "~> 0.0"
+  s.add_dependency "faraday-retry", "~> 2.0"
+  s.add_dependency "hashie", "~> 5.0"
+  s.add_dependency "httpdisk", "~> 1.0"
+  s.add_dependency "nokogiri", "~> 1.15"
+  s.add_dependency "slop", "~> 4.10"
+  s.add_dependency "sterile", "~> 1.0"
 end

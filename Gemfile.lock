@@ -2,16 +2,16 @@ PATH
   remote: .
   specs:
     sinew (4.0.1)
-      amazing_print
-      faraday
-      faraday-encoding
-      faraday-rate_limiter
-      faraday-retry
-      hashie
-      httpdisk
-      nokogiri
-      slop
-      sterile
+      amazing_print (~> 1.5)
+      faraday (~> 2.7)
+      faraday-encoding (~> 0.0)
+      faraday-rate_limiter (~> 0.0)
+      faraday-retry (~> 2.0)
+      hashie (~> 5.0)
+      httpdisk (~> 1.0)
+      nokogiri (~> 1.15)
+      slop (~> 4.10)
+      sterile (~> 1.0)
 
 GEM
   remote: http://rubygems.org/
