@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-$LOAD_PATH.unshift(File.join(__dir__, '../lib'))
+$LOAD_PATH.unshift(File.join(__dir__, "../lib"))
 
 BIN = File.basename($PROGRAM_NAME)
 
@@ -8,12 +8,12 @@ BIN = File.basename($PROGRAM_NAME)
 # Load the bare minimum and parse args with slop. For speed.
 #
 
-require 'sinew/args'
+require "sinew/args"
 begin
   slop = Sinew::Args.slop(ARGV)
 rescue Slop::Error => e
-  $stderr.puts "#{BIN}: #{e}" if e.message != ''
-  $stderr.puts("#{BIN}: try '#{BIN} --help' for more information")
+  warn "#{BIN}: #{e}" if e.message != ""
+  warn("#{BIN}: try '#{BIN} --help' for more information")
   exit 1
 end
 
@@ -21,5 +21,5 @@ end
 # now load everything and run
 #
 
-require 'sinew'
+require "sinew"
 Sinew::Main.new(slop).run

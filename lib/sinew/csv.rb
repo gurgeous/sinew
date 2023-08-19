@@ -1,5 +1,5 @@
-require 'csv'
-require 'sterile'
+require "csv"
+require "sterile"
 
 module Sinew
   class CSV
@@ -13,11 +13,11 @@ module Sinew
 
     # start writing the csv
     def start(columns)
-      raise 'started twice' if started?
+      raise "started twice" if started?
 
       @columns = columns
       @tally = columns.map { [_1, 0] }.to_h
-      @csv = ::CSV.open(path, 'wb').tap do
+      @csv = ::CSV.open(path, "wb").tap do
         _1 << columns
       end
     end
@@ -50,7 +50,7 @@ module Sinew
     end
 
     ASCII_ONLY = begin
-      chars = (33..126).map(&:chr) - ['&']
+      chars = (33..126).map(&:chr) - ["&"]
       /\A[#{Regexp.escape(chars.join)}\s]+\Z/
     end.freeze
 
@@ -59,14 +59,14 @@ module Sinew
       s = if s.respond_to?(:inner_html)
         s.inner_html
       elsif s.is_a?(Array)
-        s.join('|')
+        s.join("|")
       else
         s.to_s
       end
       return if s.empty?
 
       # simple attempt to strip tags. Note that we replace tags with spaces
-      s = s.gsub(/<[^>]+>/, ' ')
+      s = s.gsub(/<[^>]+>/, " ")
 
       if s !~ ASCII_ONLY
         # Converts MS Word 'smart punctuation' to ASCII
@@ -80,7 +80,7 @@ module Sinew
       end
 
       # squish
-      s = s.strip.gsub(/\s+/, ' ')
+      s = s.strip.gsub(/\s+/, " ")
       return if s.empty?
 
       s

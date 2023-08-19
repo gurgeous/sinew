@@ -1,7 +1,7 @@
-require 'delegate'
-require 'hashie/mash'
-require 'json'
-require 'nokogiri'
+require "delegate"
+require "hashie/mash"
+require "json"
+require "nokogiri"
 
 module Sinew
   # A wrapper around Faraday::Response, with some parsing helpers.
@@ -11,12 +11,12 @@ module Sinew
       @html ||= body.dup.tap do
         # fix invalid utf8
         if _1.encoding == Encoding::UTF_8
-          _1.encode!('UTF-8', invalid: :replace, undef: :replace, replace: '?')
+          _1.encode!("UTF-8", invalid: :replace, undef: :replace, replace: "?")
         end
 
         # squish
         _1.strip!
-        _1.gsub!(/\s+/, ' ')
+        _1.gsub!(/\s+/, " ")
 
         # kill whitespace around tags
         _1.gsub!(/ ?<([^>]+)> ?/, '<\\1>')

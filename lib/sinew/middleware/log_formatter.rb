@@ -3,7 +3,7 @@ module Sinew
     # Minimalist Formatter that logs proxy if present.
     class LogFormatter < Faraday::Logging::Formatter
       def request(env)
-        info('req') do
+        info("req") do
           # Only log the initial request, not the redirects
           return if env[:redirect]
 

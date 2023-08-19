@@ -1,17 +1,17 @@
-require 'English'
-require 'minitest/autorun'
-require 'minitest/pride'
-require 'mocha/minitest'
-require 'sinew'
-require 'webmock/minitest'
+require "English"
+require "minitest/autorun"
+require "minitest/pride"
+require "mocha/minitest"
+require "sinew"
+require "webmock/minitest"
 
 # a hint to sinew, so that it'll do things like set rate limit to zero
-ENV['SINEW_TEST'] = '1'
+ENV["SINEW_TEST"] = "1"
 
-module MiniTest
+module Minitest
   class Test
     def setup
-      @tmpdir = Dir.mktmpdir('sinew')
+      @tmpdir = Dir.mktmpdir("sinew")
       @httpbingo_stub = stub_request(:any, /httpbingo/).to_return { httpbingo(_1) }
     end
 
@@ -24,7 +24,7 @@ module MiniTest
 
     # write a tmp recipe with code, return the path
     def recipe(code)
-      File.join(@tmpdir, 'recipe.sinew').tap do
+      File.join(@tmpdir, "recipe.sinew").tap do
         IO.write(_1, code)
       end
     end
@@ -38,18 +38,18 @@ module MiniTest
       case request.uri.path
       when %r{/redirect/(\d+)}
         n = Regexp.last_match(1).to_i
-        location = n > 1 ? "/redirect/#{n - 1}" : '/get'
-        return { status: 302, headers: { Location: location } }
+        location = (n > 1) ? "/redirect/#{n - 1}" : "/get"
+        return {status: 302, headers: {Location: location}}
 
-      when '/html'
-        return { body: <<~EOF }
+      when "/html"
+        return {body: <<~EOF}
           <body>
             <h1>Herman Melville - Moby-Dick</h1>
           </body>
         EOF
 
-      when '/xml'
-        return { body: <<~EOF }
+      when "/xml"
+        return {body: <<~EOF}
           <!--   A SAMPLE set of slides   -->
           <slideshow>
             <slide type="all">
@@ -64,8 +64,8 @@ module MiniTest
 
       # otherwise just echo
       body = {}.tap do |h|
-        if q = request.uri.query
-          h[:args] = CGI.parse(q).map { [_1, _2.join(',')] }.to_h
+        if (q = request.uri.query)
+          h[:args] = CGI.parse(q).map { [_1, _2.join(",")] }.to_h
         end
         h[:body] = request.body
         h[:headers] = request.headers
@@ -73,12 +73,12 @@ module MiniTest
         h[:rand] = rand # helpful for testing caching
       end.compact
 
-      { body: JSON.pretty_generate(body) }
+      {body: JSON.pretty_generate(body)}
     end
 
     # load test.html
     def test_html
-      IO.read(File.join(__dir__, 'test.html'))
+      IO.read(File.join(__dir__, "test.html"))
     end
   end
 end

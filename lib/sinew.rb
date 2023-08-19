@@ -1,14 +1,14 @@
 # sinew
-require 'sinew/args'
-require 'sinew/base'
-require 'sinew/csv'
-require 'sinew/main'
-require 'sinew/nokogiri_ext'
-require 'sinew/response'
-require 'sinew/version'
+require "sinew/args"
+require "sinew/base"
+require "sinew/csv"
+require "sinew/main"
+require "sinew/nokogiri_ext"
+require "sinew/response"
+require "sinew/version"
 
 # custom faraday middleware
-require 'sinew/middleware/log_formatter'
+require "sinew/middleware/log_formatter"
 
 module Sinew
   # flow control for --limit
